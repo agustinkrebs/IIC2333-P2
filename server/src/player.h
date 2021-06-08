@@ -9,6 +9,7 @@ typedef struct player {
   int turns_with_x2;
   int is_reprobate;
   int brute_force;
+  int rounds_with_spine;
 } Player;
 
 void use_player_skills(Player* player);

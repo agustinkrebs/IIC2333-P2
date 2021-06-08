@@ -23,6 +23,9 @@ void update_player_life(Player* player, int value){
       player->current_life = player->life;
     }
   } else {
+    if (player->is_reprobate){
+      value = value * 1.5;
+    }
     player->current_life -= value;
     if (player->current_life < 0){
       player->current_life = 0;
@@ -30,15 +33,21 @@ void update_player_life(Player* player, int value){
   }
 };
 
+int get_damage(Player* player, int value){
+  if (player->is_reprobate){
+    value = value / 2;
+  }
+  if (player->turns_with_x2){
+    value = value * 2;
+  }
+  return value;
+}
 
 /*---Skills de Cazador---*/
 
 /* Estocada */
 void use_lunge(Player* player, Monster* monster){
-  int hurt = 1000;
-  if (player->turns_with_x2) {
-    hurt = hurt * 2;
-  }
+  int hurt = get_damage(player, 1000);
   if (monster->n_of_stabs < 3){
     monster->n_of_stabs ++;
   }
@@ -47,10 +56,7 @@ void use_lunge(Player* player, Monster* monster){
 
 /* Corte Cruzado */
 void use_cross_cut(Player* player, Monster* monster){
-  int hurt = 3000;
-  if (player->turns_with_x2) {
-    hurt = hurt * 2;
-  }
+  int hurt = get_damage(player, 3000);
   reduce_monster_life(monster, hurt);
 };
 
@@ -71,9 +77,7 @@ void use_heal(Player* player){
 /* Destello Regenerador */
 void use_regenerative_flash(Player* player1, Player* player2, Monster* monster){
   int hurt = random() + 750;
-  if (player1->turns_with_x2) {
-    hurt = hurt * 2;
-  }
+  hurt = get_damage(player1, hurt);
   reduce_monster_life(monster, hurt);
   int add_life = hurt/2 + hurt % 2;
   update_player_life(player2, add_life);
@@ -82,9 +86,7 @@ void use_regenerative_flash(Player* player1, Player* player2, Monster* monster){
 /* Descarga Vital */ 
 void use_vital_discharge(Player* player, Monster* monster){
   int hurt = player->life - player->current_life;
-  if (player->turns_with_x2) {
-    hurt = hurt * 2;
-  }
+  hurt = get_damage(player, hurt);
   reduce_monster_life(monster, hurt);
 };
 
@@ -98,10 +100,7 @@ void use_sql_injection(Player* player){
 
 /* Ataque DDOS */
 void use_ddos_attack(Player* player, Monster* monster){
-  int hurt = 1500;
-  if (player->turns_with_x2) {
-    hurt = hurt * 2;
-  }
+  int hurt = get_damage(player, 1500);
   reduce_monster_life(monster, hurt);
 };
 
@@ -109,10 +108,7 @@ void use_ddos_attack(Player* player, Monster* monster){
 void use_brute_force(Player* player, Monster* monster){
   player->brute_force ++;
   if (player->brute_force == 3){
-      int hurt = 10000;
-      if (player->turns_with_x2) {
-        hurt = hurt * 2;
-      }
+      int hurt = get_damage(player, 10000);
       reduce_monster_life(monster, hurt);
       player->brute_force = 0;
   }
