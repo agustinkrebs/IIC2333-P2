@@ -3,6 +3,10 @@ enum TypeMonster {JagRuz, Ruzalos, Ruiz};
 typedef struct monster {
   int life;
   int type;
+  int current_life;
+  int n_of_stabs;
+  int used_jump;
+  int was_distracted;
 } Monster;
 
 void use_monster_skills(Monster* monster);
