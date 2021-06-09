@@ -10,6 +10,8 @@ typedef struct player {
   int is_reprobate;
   int brute_force;
   int rounds_with_spine;
+  int current_skill;
+  int current_target;
 } Player;
 
 void use_player_skills(Player* player);
