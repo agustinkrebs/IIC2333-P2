@@ -1,25 +1,48 @@
 #include <unistd.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include "comunication.h"
 #include "conection.h"
 #include "game.h"
 
-char * revert(char * message){
-  //Se invierte el mensaje
-
-  int len = strlen(message) + 1;
-  char * response = malloc(len);
-
-  for (int i = 0; i < len-1; i++)
-  {
-    response[i] = message[len-2-i];
-  }
-  response[len-1] = '\0';
-  return response;
-}
 
 int main(int argc, char *argv[]){
+  int N_PLAYERS = 4;
+  int turn = 0;
+  int turn_value;
+  Game* game = malloc(sizeof(Game));
+  game->players = malloc(N_PLAYERS * sizeof(Player));
+  game->monster = malloc(sizeof(Monster));
+  for (int i = 0; i < N_PLAYERS; i++){
+    game->players[i] = malloc(sizeof(Player));
+    /*Falta hacer funcion  que asigna al player su tipo*/
+    choose_player_type(game->players[i]);
+  }
+  while(1){
+    turn_value = turn_choices(game, turn, N_PLAYERS);
+    if (!turn){
+      // First turn
+      choose_monster(game, turn_value);
+    } else {
+      if (turn_value){
+        if (turn_value == -1){
+          /*El jugador del turno eligio rendirse */
+        } else {
+          /* turn_value es el valor del monstruo seleccionado en el primer turno*/
+        }
+      }
+      /* Hacer algo con current_skill y current_target seteado en el jugador del turno*/
+    }
+    turn ++;
+  }
+  /* Liberar memoria */
+  for (int i = 0; i < N_PLAYERS; i++){
+    free(game->players[i]);
+  }
+  free(game->monster);
+  free(game);
+  return 0;
+
+
   // // Se define una IP y un puerto
   // char * IP = "0.0.0.0";
   // int PORT = 8080;
@@ -65,27 +88,4 @@ int main(int argc, char *argv[]){
   /*
     la variable turn siempre aumenta, para acceder al jugador especifico se hace turn% # jugadores
   */
-  int N_PLAYERS = 4;
-  int turn = 0;
-  int turn_value;
-  Game* game = malloc(sizeof(Game));
-  game->players = malloc(N_PLAYERS * sizeof(Player));
-  for (int i = 0; i < N_PLAYERS; i++){
-    game->players[i] = malloc(sizeof(Player));
-    /*Falta hacer funcion  que asigna al player su tipo*/
-  }
-  while(1){
-    turn_value = turn_choices(game, turn, N_PLAYERS);
-    if (turn_value){
-      if (turn_value == -1){
-        /*El jugador del turno eligio rendirse */
-      } else {
-        /* turn_value es el valor del monstruo seleccionado en el primer turno*/
-      }
-    }
-    /* Hacer algo con current_skill y current_target seteado en el jugador del turno*/
-    turn ++;
-  }
-  /* Liberar memoria */
-  return 0;
 }

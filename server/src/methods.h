@@ -1,18 +1,6 @@
-#include "monster.h"
+#include "classes.h"
 
-enum TypePlayer {Hunter, Doctor, Hacker};
-
-typedef struct player {
-  int life;
-  int type;
-  int current_life;
-  int turns_with_x2;
-  int is_reprobate;
-  int brute_force;
-  int rounds_with_spine;
-  int current_skill;
-  int current_target;
-} Player;
+/*---PLAYER---*/
 
 void use_player_skills(Player* player);
 void use_hounter_skills(Player* player);
@@ -56,3 +44,38 @@ void use_ddos_attack(Player* player, Monster* monster);
 
 /* Fuerza Bruta */
 void use_brute_force(Player* player, Monster* monster);
+
+
+/*---MONSTERS---*/
+
+void use_monster_skills(Monster* monster);
+void use_jagruz_skills(Monster* monster);
+void use_ruzalos_skills(Monster* monster);
+void use_ruiz_skilss(Monster* monster);
+
+/*---Skills de JagRuz---*/
+
+/* Ruzgar */
+void use_ruzgar(Player* player);
+
+/* Coletazo */
+void use_coletazo();
+
+/*---Skills de Ruzalos---*/
+
+/* Salto */
+void use_jump(Monster* monster, Player* player);
+
+/* Espina Venenosa */
+void use_poisonous_thorn(Monster* monster, Player* player);
+
+/*---Ruiz---*/
+
+/* Caso Copia */
+void use_copy_case(Monster* monster, Player* player_copy, Player* player_paste);
+
+/* Reprobaton-9000 */
+void use_reprobaton_9000(Player* player);
+
+/* sudo rm -rf */
+void use_sudo_rm();
