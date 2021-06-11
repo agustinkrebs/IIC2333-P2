@@ -1,11 +1,8 @@
 #include "methods.h"
 #include <stdlib.h>
 
-<<<<<<< HEAD:server/src/methods.c
 /*---PLAYER---*/
 
-=======
->>>>>>> menu:server/src/player.c
 void use_player_skills(Player* player);
 void use_hounter_skills(Player* player);
 void use_doctor_skills(Player* player);
@@ -60,17 +57,20 @@ void use_lunge(Player* player, Monster* monster){
     monster->n_of_stabs ++;
   }
   reduce_monster_life(monster, hurt);
+  printf("%s le infringe una estocado al mounstro\n", player->name);
 };
 
 /* Corte Cruzado */
 void use_cross_cut(Player* player, Monster* monster){
   int hurt = get_damage(player, 3000);
   reduce_monster_life(monster, hurt);
+  printf("%s le infringe un corte cruzado al mounstro\n", player->name);
 };
 
 /* Distraer */
 void use_distract(Player* player, Monster* monster){
   monster->was_distracted = 1;
+  printf("%s distrae al mounstro\n", player->name);
   // Aqui debiese ir la función que guarda al player como el último en distraer al monstruo.
 };
 
@@ -79,6 +79,7 @@ void use_distract(Player* player, Monster* monster){
 
 /* Curar */
 void use_heal(Player* player){
+  printf(" %s, recuperando 2000 de vida\n", player->name);
   update_player_life(player, 2000);
 };
 
@@ -89,6 +90,7 @@ void use_regenerative_flash(Player* player1, Player* player2, Monster* monster){
   reduce_monster_life(monster, hurt);
   int add_life = hurt/2 + hurt % 2;
   update_player_life(player2, add_life);
+  printf("%s recupera %i de vida\n", player2->name, add_life);
 };
 
 /* Descarga Vital */ 
@@ -96,6 +98,7 @@ void use_vital_discharge(Player* player, Monster* monster){
   int hurt = player->life - player->current_life;
   hurt = get_damage(player, hurt);
   reduce_monster_life(monster, hurt);
+  printf("%s utiliza su descarga vital para infringir %i de daño al mountro\n", hurt);
 };
 
 
@@ -103,19 +106,23 @@ void use_vital_discharge(Player* player, Monster* monster){
 
 /* Inyección SQL */
 void use_sql_injection(Player* player){
+  printf("%s hace una inyección de sql\n", player->name);
   player->turns_with_x2 = 2;
 };
 
 /* Ataque DDOS */
 void use_ddos_attack(Player* player, Monster* monster){
   int hurt = get_damage(player, 1500);
+  printf("%s realiza un ataque DDOS realizando %i de daño\n", player->name, hurt);
   reduce_monster_life(monster, hurt);
 };
 
 /* Fuerza Bruta */
 void use_brute_force(Player* player, Monster* monster){
   player->brute_force ++;
+  printf("%s utiliza su fuerza bruta por %i vez\n", player->name);
   if (player->brute_force == 3){
+      printf("%s realiza 1500 de daño\n", player->name);
       int hurt = get_damage(player, 10000);
       reduce_monster_life(monster, hurt);
       player->brute_force = 0;

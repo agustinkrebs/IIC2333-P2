@@ -1,3 +1,4 @@
+#include <stdbool.h>
 
 enum TypeMonster {JagRuz, Ruzalos, Ruiz};
 enum TypePlayer {Hunter, Doctor, Hacker};
@@ -13,6 +14,8 @@ typedef struct monster {
 } Monster;
 
 typedef struct player {
+  char name[20];
+  bool retired;
   int life;
   int type;
   int current_life;
