@@ -3,6 +3,7 @@
 enum TypePlayer {Hunter, Doctor, Hacker};
 
 typedef struct player {
+  char name[20];
   int life;
   int type;
   int current_life;
