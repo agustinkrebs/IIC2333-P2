@@ -1,4 +1,7 @@
 #include "classes.h"
+#include <stdio.h>
+
+int generate_random (int lower, int upper);
 
 /*---PLAYER---*/
 
@@ -48,7 +51,6 @@ void use_brute_force(Player* player, Monster* monster);
 
 /*---MONSTERS---*/
 
-void use_monster_skills(Monster* monster);
 void use_jagruz_skills(Monster* monster);
 void use_ruzalos_skills(Monster* monster);
 void use_ruiz_skilss(Monster* monster);
@@ -59,7 +61,7 @@ void use_ruiz_skilss(Monster* monster);
 void use_ruzgar(Player* player);
 
 /* Coletazo */
-void use_coletazo();
+void use_coletazo(Player* player);
 
 /*---Skills de Ruzalos---*/
 
@@ -72,7 +74,7 @@ void use_poisonous_thorn(Monster* monster, Player* player);
 /*---Ruiz---*/
 
 /* Caso Copia */
-void use_copy_case(Monster* monster, Player* player_copy, Player* player_paste);
+void use_copy_case(Player* player);
 
 /* Reprobaton-9000 */
 void use_reprobaton_9000(Player* player);

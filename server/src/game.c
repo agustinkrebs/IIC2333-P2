@@ -1,13 +1,10 @@
 #include <stddef.h>
-#include <stdio.h>
 #include <stdbool.h>
 #include <string.h> 
 #include <unistd.h>     /* Symbolic Constants */
 #include <sys/types.h>  /* Primitive System Data Types */ 
 #include <stdlib.h>     /* General Utilities */
 #include "game.h"
-#include "methods.h"
-#include "classes.h"
 
 int player_life[] = {5000, 3000, 2500};
 int monster_life[] = {10000, 20000, 25000};
@@ -23,6 +20,9 @@ void choose_monster(Game* game, int selection){
     } else if (selection == 3){
         monster->type = Ruiz;
         printf("\nHas seleccionado al monstruo Ruiz con %i de vida\n\n", monster_life[selection - 1]);
+    } else if (selection == 4){
+        // ESCOGER MONSTRUO RANDOM.
+        printf("FALTA ESTE CASO\n");
     }
     monster->life = monster_life[selection - 1];
     monster->current_life = monster_life[selection - 1];
@@ -73,8 +73,18 @@ Player* create_new_player() {
     printf("2) Medico\n");
     printf("3) Hacker\n");
     printf("Selecciona la clase con la que quieres jugar: \n");
-    scanf("%i", class);
+    scanf("%i", &class);
     player->type = class - 1;
+    while(player->type < 0  || player->type > 2){
+        printf("Debes seleccionar una clase disponible\n");
+        printf("%s estas son las clases disponibles:\n", player->name);
+        printf("1) Cazador\n");
+        printf("2) Medico\n");
+        printf("3) Hacker\n");
+        printf("Selecciona la clase con la que quieres jugar: \n");
+        scanf("%i", &class);
+        player->type = class - 1;
+    }
     if (player->type == Hunter) {
         player->life = 5000;
         player->current_life = 5000;
@@ -92,12 +102,11 @@ Player* create_new_player() {
     player->brute_force = 0;
     player->turns_with_x2 = 0;
     player->rounds_with_spine = 0;
+    player->venom_damage = 0;
     player->current_skill = -1;
     player->current_target = -1;
     return player;
 }
-
-
 
 int turn_choices(Game* game, int player_turn, int n_players){
     /*
@@ -109,7 +118,7 @@ int turn_choices(Game* game, int player_turn, int n_players){
     6) se retorna cero
     */
     int i;
-    if (!player_turn) {
+    if (!game->rounds) {
         printf("---Inicio de Juego---\n");
         printf("Lider estos son los monstruos con los que puedes combatir:\n");
         printf("1) Great JagRuz\n");
@@ -129,16 +138,20 @@ int turn_choices(Game* game, int player_turn, int n_players){
                 }
                 printf("%s[%i] -> Vida %i / %i\n", player_list->name, player_list->type, player_list->current_life, player_list->life);
             }
+            printf("\n---Situación del monstruo---\n");
+            printf("Monstruo -> Vida %i / %i\n", game->monster->current_life, game->monster->life);
+
         }
         Player* player = game->players[player_turn % n_players];
         if (player->current_life > 0 && !player->retired) {
             printf("Turno de %s \n", player->name);
-            printf("¿ Deseas rendirte ?");
-            printf("Presiona -1 si quieres rendirte");
-            scanf("%i",&i);
+            printf("¿ Deseas rendirte ?\n");
+            printf("Presiona -1 si quieres rendirte. Cualquier otro número en caso contrario\n");
+            scanf("%i", &i);
             if (i == -1) {
                 player->retired = true;
                 printf("%s se ha retirado del juego", player->name);
+                game->remaining_players -= 1;
                 return i;
             };
             printf("---Elegir Habilidad---\n");
@@ -147,7 +160,7 @@ int turn_choices(Game* game, int player_turn, int n_players){
             } else if (player->type == Doctor){
                 printf("1) Curar\n2) Destello Regenerador\n3) Descarga Vital\n");
             } else if (player->type == Hacker){
-                printf("1) Inyección SQL\n2) Ataque DDOS\n3)Fuerza Bruta");
+                printf("1) Inyección SQL\n2) Ataque DDOS\n3)Fuerza Bruta\n");
             }
             scanf("%i",&i);
             player->current_skill = i - 1;
@@ -155,27 +168,27 @@ int turn_choices(Game* game, int player_turn, int n_players){
                 if (player->current_skill == 0){
                     printf("---Elegir Objetivo---\n"); /* Hay que cachar si las habilidades se puede aplicar a uno mismo*/
                     for (int j = 0; j < n_players;j++){
-                        printf("%i) Jugador %i", j + 1, j +1);
+                        printf("%i) Jugador %i\n", j + 1, j +1);
                     }
                     scanf("%i",&i);
-                    player->current_target = i;
+                    player->current_target = i - 1;
                 }
                 else if (player->current_skill == 1){
                     //elegir jugador al azar
                     int index_player = player_turn;
-                    while (index_player == player_turn); {//numero random distinto al actual
-                        int index_player = generate_random(1, 4);
+                    while ((index_player == player_turn) && (!game->players[index_player]->retired)); {//numero random distinto al actual
+                        index_player = generate_random(0, game->n_players - 1);
                     }   
                     player->current_target = index_player;
                 }
             } else if (player->type == Hacker){
                 if(player->current_skill == 0){
-                    pritnf("---Elegir Objetivo---\n"); /* Hay que cachar si las habilidades se puede aplicar a uno mismo*/
+                    printf("---Elegir Objetivo---\n"); /* Hay que cachar si las habilidades se puede aplicar a uno mismo*/
                     for (int j = 0; j < n_players;j++){
-                        printf("%i) Jugador %i", j + 1, j +1);
+                        printf("%i) Jugador %i\n", j + 1, j +1);
                     }
                     scanf("%i",&i);
-                    player->current_target = i;
+                    player->current_target = i - 1;
                 }
             }
             use_skills(player, game);
@@ -201,10 +214,11 @@ void use_skills(Player* player, Game* game){
         if (player->current_skill == 0 ) {
             printf("%s cura a", player->name);
             use_heal(game->players[player->current_target]);
-
+            printf("El poder va sobre el jugador: %s\n", game->players[player->current_target]->name);
         }
         else if (player->current_skill == 1) {
             printf("%s utiliza el rayo regenerador. ", player->name);
+            printf("El poder va sobre el jugador: %s\n", game->players[player->current_target]->name);
             use_regenerative_flash(player, game->players[player->current_target], game->monster);
         }
         else {
@@ -213,6 +227,7 @@ void use_skills(Player* player, Game* game){
     }
     else {
         if (player->current_skill == 0) {
+            printf("El poder va sobre el jugador: %s\n", game->players[player->current_target]->name);
             use_sql_injection(game->players[player->current_target]);
         }
         else if (player->current_skill == 1) {
@@ -221,5 +236,79 @@ void use_skills(Player* player, Game* game){
         else {
             use_brute_force(player, game->monster);
         }  
+    }
+}
+
+Player* get_random_player(Game* game){
+    Player* current_players[game->remaining_players];
+    int j = 0;
+    for (int i = 0; i < game->n_players; i++){
+        if (!game->players[i]->retired){
+            current_players[j] = game->players[i];
+            j++;
+        }
+    }
+    j = generate_random(0, game->remaining_players);
+    return current_players[j];
+}
+
+void use_monster_skills(Game* game){
+    int prob = generate_random(0, 100);
+    printf("Probabilidad obtenida: %i\n", prob);
+    Player* selected_player = get_random_player(game);
+    if (game->monster->type == JagRuz){
+        if (prob < 50) {
+            use_ruzgar(selected_player);
+        } else {
+            for (int i = 0; i < game->n_players; i++){
+                if (!game->players[i]->retired){
+                    use_coletazo(game->players[i]);
+                }
+            }
+        }
+    }
+    else if (game->monster->type == Ruzalos) {
+        if (prob < 40 && !game->monster->used_jump) {
+            use_jump(game->monster, selected_player);
+        } else {
+            use_poisonous_thorn(game->monster, selected_player);
+        }
+    }
+    else {
+        if (prob < 40) {
+            use_copy_case(selected_player);
+        } else if (prob < 60){
+            use_reprobaton_9000(selected_player);
+        } else {
+            use_sudo_rm();
+        }
+    }
+}
+
+void update_round(Game* game){
+    printf("\n\n------------ OTROS DE LA RONDA ----------------\n\n");
+    if (game->monster->n_of_stabs){
+        printf("Debido a las %i estocadas que tiene el monstruo,\neste pierde %i de vida\n", game->monster->n_of_stabs, game->monster->n_of_stabs * 500);
+        reduce_monster_life(game->monster, game->monster->n_of_stabs * 500);
+    }
+    game->remaining_players = game->n_players;
+    for (int i = 0; i < game->n_players; i++){
+        if (!game->players[i]->retired){
+            if (game->players[i]->turns_with_x2){
+                game->players[i]->turns_with_x2 --;
+                printf("Al jugador %s ahora le quedan %i turnos con x2\n", game->players[i]->name, game->players[i]->turns_with_x2);
+            }
+            if (game->players[i]->rounds_with_spine){
+                printf("Debido al veneno, el jugador %s pierde %i de vida\n", game->players[i]->name, game->players[i]->venom_damage);
+                update_player_life(game->players[i], -game->players[i]->venom_damage);
+                game->players[i]->rounds_with_spine --;
+                printf("Le quedan %i rondas sufriendo esto.... :(\n", game->players[i]->rounds_with_spine);
+            }
+        } else {
+            game->remaining_players --;
+        }
+    }
+    if (!game->remaining_players){
+        printf("El monstruo ha ganado...\n");
     }
 }
