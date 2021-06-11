@@ -4,34 +4,30 @@
 #include "conection.h"
 #include "game.h"
 
+int N_PLAYERS = 4;
 
 int main(int argc, char *argv[]){
-  int N_PLAYERS = 4;
   int turn = 0;
   int turn_value;
   Game* game = malloc(sizeof(Game));
-  game->players = malloc(N_PLAYERS * sizeof(Player));
+  game->players = malloc(N_PLAYERS*sizeof(Player));
+  game->n_players = N_PLAYERS;
+  game->players_connected = 0;
   game->monster = malloc(sizeof(Monster));
   for (int i = 0; i < N_PLAYERS; i++){
-    game->players[i] = malloc(sizeof(Player));
-    /*Falta hacer funcion  que asigna al player su tipo*/
-    choose_player_type(game->players[i]);
+    game->players[i] = create_new_player();
   }
   while(1){
     turn_value = turn_choices(game, turn, N_PLAYERS);
     if (!turn){
       // First turn
       choose_monster(game, turn_value);
-    } else {
-      if (turn_value){
-        if (turn_value == -1){
-          /*El jugador del turno eligio rendirse */
-        } else {
-          /* turn_value es el valor del monstruo seleccionado en el primer turno*/
-        }
-      }
-      /* Hacer algo con current_skill y current_target seteado en el jugador del turno*/
+    } 
+    else {
+      printf("FALTA MOUNSTRO\n");
+      //ya esta haciendo el llamado a las funciones de los jugadores, falta el mounstro
     }
+      /* Hacer algo con current_skill y current_target seteado en el jugador del turno*/
     turn ++;
   }
   /* Liberar memoria */

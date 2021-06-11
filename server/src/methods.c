@@ -1,12 +1,20 @@
 #include "methods.h"
 #include <stdlib.h>
 
+<<<<<<< HEAD:server/src/methods.c
 /*---PLAYER---*/
 
+=======
+>>>>>>> menu:server/src/player.c
 void use_player_skills(Player* player);
 void use_hounter_skills(Player* player);
 void use_doctor_skills(Player* player);
 void use_hackers_skills(Player* player);
+
+int generate_random (int upper, int lower) {
+  int number = (rand() % (upper - lower + 1)) + lower;
+  return number;
+}
 
 void reduce_monster_life(Monster* monster, int hurt){
   if (monster->current_life - hurt < 0){
@@ -76,7 +84,7 @@ void use_heal(Player* player){
 
 /* Destello Regenerador */
 void use_regenerative_flash(Player* player1, Player* player2, Monster* monster){
-  int hurt = random() + 750;
+  int hurt = generate_random(750, 2000);
   hurt = get_damage(player1, hurt);
   reduce_monster_life(monster, hurt);
   int add_life = hurt/2 + hurt % 2;

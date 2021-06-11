@@ -1,6 +1,25 @@
+<<<<<<< HEAD:server/src/methods.h
 #include "classes.h"
 
 /*---PLAYER---*/
+=======
+#include "monster.h"
+
+enum TypePlayer {Hunter, Doctor, Hacker};
+
+typedef struct player {
+  char name[20];
+  int life;
+  int type;
+  int current_life;
+  int turns_with_x2;
+  int is_reprobate;
+  int brute_force;
+  int rounds_with_spine;
+  int current_skill;
+  int current_target;
+} Player;
+>>>>>>> menu:server/src/player.h
 
 void use_player_skills(Player* player);
 void use_hounter_skills(Player* player);
