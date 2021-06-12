@@ -176,7 +176,9 @@ int turn_choices(Game* game, int player_turn, int n_players){
                 if (player->current_skill == 0){
                     printf("---Elegir Objetivo---\n"); /* Hay que cachar si las habilidades se puede aplicar a uno mismo*/
                     for (int j = 0; j < n_players;j++){
-                        printf("%i) Jugador %s\n", j + 1, game->players[j]->name);
+                        if (j != player_turn) {
+                            printf("%i) Jugador %s\n", j + 1, game->players[j]->name);
+                        }
                     }
                     scanf("%i",&i);
                     player->current_target = i - 1;
@@ -184,9 +186,9 @@ int turn_choices(Game* game, int player_turn, int n_players){
                 else if (player->current_skill == 1){
                     //elegir jugador al azar
                     int index_player = player_turn;
-                    while ((index_player == player_turn) && (!game->players[index_player]->retired)); {//numero random distinto al actual
-                        index_player = generate_random(0, game->n_players - 1);
-                    }   
+                    while ((index_player == player_turn) || (game->players[index_player]->retired) ) {//numero random distinto al actual|| (game->players[index_player]->retired)
+                        index_player = generate_random(0, game->n_players);
+                    }
                     player->current_target = index_player;
                 }
             } else if (player->type == Hacker){

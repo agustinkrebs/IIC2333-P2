@@ -37,8 +37,16 @@ int main(int argc, char *argv[]){
       use_monster_skills(game);
     }
     /* Hacer algo con current_skill y current_target seteado en el jugador del turno*/
-    update_round(game);
+    if (game->remaining_players && game->monster->current_life) {
+      update_round(game);
+    }
     game->rounds ++;
+  }
+  if (game->remaining_players == 0 ) {
+    printf("No quedan jugadores. Monstruo gano\n");
+  }
+  else{
+    printf("Felicidades! Han logrado vencer al monstruo\n");
   }
   /* Liberar memoria */
   for (int i = 0; i < N_PLAYERS; i++){
