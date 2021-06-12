@@ -16,7 +16,7 @@ void update_player_life(Player* player, int value);
 /*---Skills de Cazador---*/
 
 /* Estocada */
-void use_lunge(Player* player, Monster* monster);
+int use_lunge(Player* player, Monster* monster);
 
 /* Corte Cruzado */
 void use_cross_cut(Player* player, Monster* monster);
@@ -80,4 +80,4 @@ void use_copy_case(Player* player);
 void use_reprobaton_9000(Player* player);
 
 /* sudo rm -rf */
-void use_sudo_rm();
+void use_sudo_rm(Player** players, int n_players, int rounds);

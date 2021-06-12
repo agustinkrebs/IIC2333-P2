@@ -56,13 +56,19 @@ int get_damage(Player* player, int value){
 /*---Skills de Cazador---*/
 
 /* Estocada */
-void use_lunge(Player* player, Monster* monster){
+int use_lunge(Player* player, Monster* monster){
+  //en este caso estocada retorna exito si el mountro todavia no tiene estocadas, sino fracaso para que el jugador pueda seleccionar otra habilidad.
   int hurt = get_damage(player, 1000);
   if (monster->n_of_stabs < 3){
     monster->n_of_stabs ++;
+    reduce_monster_life(monster, hurt);
+    printf("%s le infringe una estocado al mounstro\n", player->name);
+    return 1;
   }
-  reduce_monster_life(monster, hurt);
-  printf("%s le infringe una estocado al mounstro\n", player->name);
+  else {
+    printf("Mounstro ya tiene 3 estocadas\n");
+    return 0;
+  }
 };
 
 /* Corte Cruzado */
@@ -74,9 +80,9 @@ void use_cross_cut(Player* player, Monster* monster){
 
 /* Distraer */
 void use_distract(Player* player, Monster* monster){
-  monster->was_distracted = 1;
+  monster->distracted = true;
+  monster->player_distracted = player;
   printf("%s distrae al mounstro\n", player->name);
-  // Aqui debiese ir la función que guarda al player como el último en distraer al monstruo.
 };
 
 
@@ -124,9 +130,9 @@ void use_ddos_attack(Player* player, Monster* monster){
 /* Fuerza Bruta */
 void use_brute_force(Player* player, Monster* monster){
   player->brute_force ++;
-  printf("%s utiliza su fuerza bruta por %i vez\n", player->name);
+  printf("%s utiliza su fuerza bruta por %i vez\n", player->name, player->brute_force);
   if (player->brute_force == 3){
-      printf("%s realiza 1500 de daño\n", player->name);
+      printf("%s realiza 10000 de daño\n", player->name);
       int hurt = get_damage(player, 10000);
       reduce_monster_life(monster, hurt);
       player->brute_force = 0;
@@ -185,10 +191,16 @@ void use_copy_case(Player* player){
 /* Reprobaton-9000 */
 void use_reprobaton_9000(Player* player){
   printf("REPROBATON sobre %s\n", player->name);
-  player->is_reprobate = 1;
+  player->is_reprobate = true;
 };
 
 /* sudo rm -rf */
-void use_sudo_rm(){
-  
+void use_sudo_rm(Player** players, int n_players, int rounds){
+  printf("SUDO RM sobre todos los jugadores con daño de %i\n", -100*rounds);
+  for (int i = 0; i < n_players; i++){
+    Player* player = players[i];
+    if (!player->retired){
+      update_player_life(player, -100*rounds);
+    }
+  }
 };
