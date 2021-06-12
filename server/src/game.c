@@ -11,6 +11,10 @@ int monster_life[] = {10000, 20000, 25000};
 
 void choose_monster(Game* game, int selection){
     Monster* monster = malloc(sizeof(Monster));
+    if (selection == 4) {
+        printf("Seleccionando monstruo al azar...\n");
+        selection = generate_random(1,3);
+    }
     if (selection == 1){
         monster->type = JagRuz;
         printf("\nHas seleccionado al monstruo JagRuz con %i de vida\n\n", monster_life[selection - 1]);
@@ -20,9 +24,6 @@ void choose_monster(Game* game, int selection){
     } else if (selection == 3){
         monster->type = Ruiz;
         printf("\nHas seleccionado al monstruo Ruiz con %i de vida\n\n", monster_life[selection - 1]);
-    } else if (selection == 4){
-        // ESCOGER MONSTRUO RANDOM.
-        printf("FALTA ESTE CASO\n");
     }
     monster->life = monster_life[selection - 1];
     monster->current_life = monster_life[selection - 1];
