@@ -12,7 +12,8 @@
 //https://www.man7.org/linux/man-pages/man2/accept.2.html
 
 
-PlayersInfo * prepare_sockets_and_get_clients(char * IP, int port){
+int prepare_socket(char * IP, int port) {
+
   // Se define la estructura para almacenar info del socket del servidor al momento de su creación
   struct sockaddr_in server_addr;
 
@@ -31,21 +32,49 @@ PlayersInfo * prepare_sockets_and_get_clients(char * IP, int port){
 
   // Se le asigna al socket del servidor un puerto y una IP donde escuchar
   int ret2 = bind(server_socket, (struct sockaddr *)&server_addr, sizeof(server_addr));
+  return server_socket;
+
+}
+
+PlayersInfo * get_team_leader(char server_socket){
+  
 
   // Se coloca el socket en modo listening
   int ret3 = listen(server_socket, 1);
 
   // Se definen las estructuras para almacenar info sobre los sockets de los clientes
   struct sockaddr_in client1_addr;
-  struct sockaddr_in client2_addr;
   socklen_t addr_size = sizeof(client1_addr);
-
   // Se inicializa una estructura propia para guardar los n°s de sockets de los clientes.
   PlayersInfo * sockets_clients = malloc(sizeof(PlayersInfo));
 
-  // Se aceptan a los primeros 2 clientes que lleguen. "accept" retorna el n° de otro socket asignado para la comunicación
-  sockets_clients->socket_c1 = accept(server_socket, (struct sockaddr *)&client1_addr, &addr_size);
-  sockets_clients->socket_c2 = accept(server_socket, (struct sockaddr *)&client2_addr, &addr_size);
+  // Se crea un arreglo en donde se guardarán a los clientes
+  int arr[4];
+  sockets_clients->clients = arr;
+
+  // Se aceptan a al primer cliente que llega. "accept" retorna el n° de otro socket asignado para la comunicación
+  sockets_clients->clients[0] = accept(server_socket, (struct sockaddr *)&client1_addr, &addr_size);
+  sockets_clients->number_clients = 1;
+
 
   return sockets_clients;
+}
+
+
+int add_client(int server_socket){
+  
+  int client;
+
+  // Se coloca el socket en modo listening
+  int ret3 = listen(server_socket, 1);
+
+  // Se definen las estructuras para almacenar info sobre los sockets de los clientes
+  struct sockaddr_in client_addr;
+  socklen_t addr_size = sizeof(client_addr);
+
+  // Se aceptan a los primeros 2 clientes que lleguen. "accept" retorna el n° de otro socket asignado para la comunicación
+  client = accept(server_socket, (struct sockaddr *)&client_addr, &addr_size);
+  printf("Se ha conectado un cliente de forma existosa\n");
+
+  return client;
 }

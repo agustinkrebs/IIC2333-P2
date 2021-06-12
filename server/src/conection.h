@@ -16,8 +16,10 @@
 //https://pubs.opengroup.org/onlinepubs/7908799/xns/netdb.h.html
 
 typedef struct players_info{
-  int socket_c1;
-  int socket_c2;
+  int *clients;
+  int number_clients;
 } PlayersInfo;
 
-PlayersInfo * prepare_sockets_and_get_clients(char * IP, int port);
+int prepare_socket(char * IP, int port);
+PlayersInfo * get_team_leader(char server_socket);
+int add_client(int server_socket);

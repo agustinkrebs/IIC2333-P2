@@ -26,4 +26,5 @@ typedef struct player {
   int venom_damage;
   int current_skill;
   int current_target;
+  int socket;
 } Player;
