@@ -32,6 +32,8 @@ int prepare_socket(char * IP, int port) {
 
   // Se le asigna al socket del servidor un puerto y una IP donde escuchar
   int ret2 = bind(server_socket, (struct sockaddr *)&server_addr, sizeof(server_addr));
+  // Se coloca el socket en modo listening
+  int ret3 = listen(server_socket, 1);
   return server_socket;
 
 }
@@ -64,9 +66,6 @@ PlayersInfo * get_team_leader(char server_socket){
 int add_client(int server_socket){
   
   int client;
-
-  // Se coloca el socket en modo listening
-  int ret3 = listen(server_socket, 1);
 
   // Se definen las estructuras para almacenar info sobre los sockets de los clientes
   struct sockaddr_in client_addr;

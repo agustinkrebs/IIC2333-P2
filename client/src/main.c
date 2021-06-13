@@ -42,12 +42,28 @@ int main (int argc, char *argv[]){
 
       printf("Ingrese su nombre:\n");
       char * name = get_input();
-      getchar(); //Para capturar el "enter" que queda en el buffer de entrada stdin
 
-      printf("Ingrese su mensaje: ");
-      char * response = get_input();
+      printf("(1) Cazador\n");
+      printf("(2) Medico \n");
+      printf("(3) Hacker\n");
+      printf("Ingrese el numero de la clase de su personaje:\n");
+      char * class = get_input();
 
-      client_send_message(server_socket, 1, response);
+      char buf[256];
+      snprintf(buf, sizeof(buf), "%s|%s", name, class);
+
+      client_send_message(server_socket, 2, buf);
+    }
+
+    if (msg_code == 3) { //Recibimos un mensaje que proviene del otro cliente
+      char * message = client_receive_payload(server_socket);
+      printf("El otro cliente dice: %s\n", message);
+      free(message);
+
+      printf("Ingresa cualquier caracter para comenzar el juego:\n");
+      char * x = get_input();
+
+      client_send_message(server_socket, 3, x);
     }
   }
 

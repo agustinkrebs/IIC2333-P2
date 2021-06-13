@@ -27,4 +27,5 @@ typedef struct player {
   int current_skill;
   int current_target;
   int socket;
+  int id;
 } Player;
