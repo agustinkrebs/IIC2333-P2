@@ -18,11 +18,13 @@ char * get_input(){
 
 
 int main (int argc, char *argv[]){
-  // Ejemplo de input de consola: ./client -i 0.0.0.0 -p tcp_8080
+  // Ejemplo de input de consola: ./client -i 0.0.0.0 -p 8080
 
   //Se obtiene la ip y el puerto donde está escuchando el servidor (la ip y puerto de este cliente da igual)
-  char * IP = argv[2];
-  int PORT = argv[4];
+  // char * IP = argv[2];
+  // int PORT = atoi(argv[4]);
+  char * IP = "0.0.0.0";
+  int PORT = 8080;
 
   printf("main | ip_address: %s\n", argv[2]);
   printf("main | tcp_port: %s\n", argv[4]);
@@ -37,13 +39,13 @@ int main (int argc, char *argv[]){
     if (msg_code == 1) { //Recibimos un mensaje del servidor
       char * message = client_receive_payload(server_socket);
       printf("%s\n", message);
-      free(message);
+      //free(message);
     }
 
     if (msg_code == 2) { //Recibimos un mensaje que proviene del otro cliente
       char * message = client_receive_payload(server_socket);
       printf("%s\n", message);
-      free(message);
+      //free(message);
 
       printf("Ingrese su nombre:\n");
       char * name = get_input();
@@ -56,27 +58,26 @@ int main (int argc, char *argv[]){
       char buf[256];
       snprintf(buf, sizeof(buf), "%s|%s", name, class);
       client_send_message(server_socket, 2, buf);
-      free(class);
-      free(name);
-      free(buf);
+      //free(class);
+      //free(name);
     }
 
     if (msg_code == 3) { //Recibimos un mensaje que proviene del otro cliente
       char * message = client_receive_payload(server_socket);
       printf("%s\n", message);
-      free(message);
+      //free(message);
 
       printf("Ingresa cualquier caracter para comenzar el juego:\n");
       char * x = get_input();
       client_send_message(server_socket, 3, x);
-      free(message);
-      free(x);
+      //free(message);
+      //free(x);
     }
 
     if (msg_code == 55) { //Recibimos un mensaje que proviene del otro cliente
       char * message = client_receive_payload(server_socket);
       printf("%s\n", message);
-      free(message);
+      //free(message);
 
       printf("(1) Great JagRuz\n");
       printf("(2) Ruzalos \n");
@@ -85,7 +86,7 @@ int main (int argc, char *argv[]){
       printf("Ingrese el numero correspondiente al mounstro que quieren combatir:\n");
       char * response = get_input();
       client_send_message(server_socket, 55, response);
-      free(response);
+      //free(response);
     }
 
     if (msg_code == 99) { 
@@ -93,17 +94,17 @@ int main (int argc, char *argv[]){
       printf("Presiona -1 si quieres rendirte. Cualquier otro número en caso contrario\n");
       char * response = get_input();
       client_send_message(server_socket, 98, response);
-      free(response);
+      //free(response);
     }
 
     if (msg_code == 97) { 
       char * message = client_receive_payload(server_socket);
       printf("---Elegir Habilidad---\n");
       printf("%s", message);
-      free(message);
+      //free(message);
       char * response = get_input();
       client_send_message(server_socket, 96, response);
-      free(response);
+      //free(response);
     }
 
     if (msg_code == 95) { 
@@ -113,16 +114,16 @@ int main (int argc, char *argv[]){
       for (int j = 0; j < n_players; j++){
           printf("%i) Jugador %i\n", j + 1, j +1);
       }
-      free(message);
+      //free(message);
       char * response = get_input();
       client_send_message(server_socket, 94, response);
-      free(response);
+      //free(response);
     }
   }
 
   // Se cierra el socket
   close(server_socket);
-  free(IP);
+  //free(IP);
 
   return 0;
 }

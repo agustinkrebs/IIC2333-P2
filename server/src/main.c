@@ -51,8 +51,10 @@ int main(int argc, char *argv[]){
   game->monster = malloc(sizeof(Monster));
 
   // Se define una IP y un puerto
-  char * IP = argv[2];
-  int PORT = atoi(argv[4]);
+  // char * IP = argv[2];
+  // int PORT = atoi(argv[4]);
+  char * IP = "0.0.0.0";
+  int PORT = 8080;
 
   printf("main | ip_address: %s\n", argv[2]);
   printf("main | tcp_port: %s\n", argv[4]);
@@ -80,7 +82,7 @@ int main(int argc, char *argv[]){
   FD_SET(server_socket, &current_sockets);
 
   while (lobby){
-
+    printf("Estamos en el lobby\n");
     ready_sockets = current_sockets;
     if (select(FD_SETSIZE, &ready_sockets, NULL, NULL, NULL) < 0){
       exit(-1);
@@ -163,10 +165,10 @@ int main(int argc, char *argv[]){
                 *message = "\n------------- Fin Alerta ---------------- \n";
                 server_send_message(game->players[0]->socket, 1, *message);
               }
-              free(class_preference_name);
-              free(token);
+              //free(class_preference_name);
+              //free(token);
             }
-            free(client_message);
+            //free(client_message);
           }
           // Caso en que el usuario quiera empezar el juego
           if (msg_code == 3){
@@ -180,7 +182,7 @@ int main(int argc, char *argv[]){
               *message = "Hay jugadores que aun no declaran su nombre y clase! Intenta iniciar el juego en unos momentos más!\n\n";
               server_send_message(game->players[found]->socket, 3, *message);
             }
-            free(client_message);
+            //free(client_message);
           }
 
           if (msg_code == 55){
@@ -194,7 +196,9 @@ int main(int argc, char *argv[]){
             for (i = 0; i < number_clients; i ++) {
               server_send_message(game->players[i]->socket, 1, *message);
             }   
-            free(client_message);  
+            //free(client_message);  
+            lobby = 0;
+            break;
           }
         }
       }
@@ -203,31 +207,12 @@ int main(int argc, char *argv[]){
   printf("okkk\n");
   
 
-
-  // Recepción de datos de los jugadores
-  int players_data = 0;
-  int attention = 0;
-  while (players_data < number_clients){
-    char * client_message = server_receive_payload(game->players[attention]->socket);
-    printf("El cliente %d dice: %s\n", attention+1, client_message);
-    players_data ++;
-    attention ++;
-    if (attention == 4){
-      attention = 0;
-    }
-  }
-
   int turn = 0;
   int turn_value;
   
   // Como no está inicializado el monstruo se cae al tratar de ver su current life
   while((game->remaining_players && game->monster->current_life) || !game->rounds){
-    if (!game->rounds){
-      // First turn
-      printf("\n\n------------ Turno de jugador %s ----------------\n\n", game->players[turn]->name);
-      turn_value = turn_choices(game, turn, N_PLAYERS);
-      choose_monster(game, turn_value);
-    } else {
+    if (game->rounds) {
       for (int turn = 0; turn < game->n_players; turn++){
         if (!game->players[turn]->retired){
           printf("\n\n------------ Turno de jugador %s ----------------\n\n", game->players[turn]->name);
@@ -236,23 +221,23 @@ int main(int argc, char *argv[]){
       }
       printf("\n\n------------ Turno de monstruo ----------------\n\n");
       use_monster_skills(game);
+      /* Hacer algo con current_skill y current_target seteado en el jugador del turno*/
+      update_round(game);
     }
-    /* Hacer algo con current_skill y current_target seteado en el jugador del turno*/
-    update_round(game);
     game->rounds ++;
   }
   /* Liberar memoria */
   for (int i = 0; i < N_PLAYERS; i++){
-    free(game->players[i]);
+    //free(game->players[i]);
   }
   
-  free(IP);
-  free(message);
-  free(name); 
-  free(clase);
+  //free(IP);
+  //free(message);
+  //free(name); 
+  //free(clase);
 
-  free(game->monster);
-  free(game);
+  //free(game->monster);
+  //free(game);
   return 0;
 
     

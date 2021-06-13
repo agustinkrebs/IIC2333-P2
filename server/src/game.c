@@ -100,7 +100,8 @@ int turn_choices(Game* game, int player_turn, int n_players){
     6) se retorna cero
     */
     int i;
-    char *message[255];
+    char* message[255];
+    char* response[255];
     if (!game->rounds) {
         printf("---Inicio de Juego---\n");
         printf("Lider estos son los monstruos con los que puedes combatir:\n");
@@ -136,7 +137,7 @@ int turn_choices(Game* game, int player_turn, int n_players){
             */
             *message = "";
             server_send_message(player->socket, 99, *message);
-            char* response = server_receive_payload(player->socket);
+            *response = server_receive_payload(player->socket);
             if (strcmp(response, "-1") == 0) {
                 player->retired = true;
                 printf("%s se ha retirado del juego", player->name);
@@ -153,7 +154,7 @@ int turn_choices(Game* game, int player_turn, int n_players){
             }
             // scanf("%i",&i);
             server_send_message(player->socket, 97, *message);
-            char* response = server_receive_payload(player->socket);
+            *response = server_receive_payload(player->socket);
             player->current_skill = atoi(response[0]) - 1; // Aquí asumimos que el usuario responde un input válido
             if (player->type == Doctor){
                 if (player->current_skill == 0){
@@ -165,7 +166,7 @@ int turn_choices(Game* game, int player_turn, int n_players){
                     // scanf("%i",&i);
                     sprintf(message, "%d", n_players); // Convertimos la cantidad de jugadores en un string para mandarlo como mensaje
                     server_send_message(player->socket, 95, *message);
-                    char* response = server_receive_payload(player->socket);
+                    *response = server_receive_payload(player->socket);
                     player->current_target = atoi(response[0]) - 1; // Aquí asumimos que el usuario responde un input válido
                 }
                 else if (player->current_skill == 1){
