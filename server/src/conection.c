@@ -40,6 +40,7 @@ PlayersInfo * get_team_leader(char server_socket){
   
 
   // Se coloca el socket en modo listening
+  printf("get_team_leader | Empezaré a escuchar a un líder\n");
   int ret3 = listen(server_socket, 1);
 
   // Se definen las estructuras para almacenar info sobre los sockets de los clientes
@@ -74,7 +75,7 @@ int add_client(int server_socket){
 
   // Se aceptan a los primeros 2 clientes que lleguen. "accept" retorna el n° de otro socket asignado para la comunicación
   client = accept(server_socket, (struct sockaddr *)&client_addr, &addr_size);
-  printf("Se ha conectado un cliente de forma existosa\n");
+  printf("add_client | Se ha conectado un cliente de forma existosa\n");
 
   return client;
 }

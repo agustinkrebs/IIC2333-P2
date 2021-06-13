@@ -5,6 +5,7 @@
 #include <sys/types.h>  /* Primitive System Data Types */ 
 #include <stdlib.h>     /* General Utilities */
 #include "game.h"
+#include "comunication.h"
 
 int player_life[] = {5000, 3000, 2500};
 int monster_life[] = {10000, 20000, 25000};
@@ -118,6 +119,7 @@ int turn_choices(Game* game, int player_turn, int n_players){
     6) se retorna cero
     */
     int i;
+    char *message[255];
     if (!game->rounds) {
         printf("---Inicio de Juego---\n");
         printf("Lider estos son los monstruos con los que puedes combatir:\n");
@@ -145,33 +147,45 @@ int turn_choices(Game* game, int player_turn, int n_players){
         Player* player = game->players[player_turn % n_players];
         if (player->current_life > 0 && !player->retired) {
             printf("Turno de %s \n", player->name);
+            printf("Esperando para ver si quiere retirarse o continuar jugando\n");
+            /*
             printf("¿ Deseas rendirte ?\n");
             printf("Presiona -1 si quieres rendirte. Cualquier otro número en caso contrario\n");
             scanf("%i", &i);
-            if (i == -1) {
+            */
+            *message = "";
+            server_send_message(player->socket, 99, *message);
+            char* response = server_receive_payload(player->socket);
+            if (strcmp(response, "-1") == 0) {
                 player->retired = true;
                 printf("%s se ha retirado del juego", player->name);
                 game->remaining_players -= 1;
                 return i;
             };
-            printf("---Elegir Habilidad---\n");
+            // printf("---Elegir Habilidad---\n");
             if (player->type == Hunter){
-                printf("1) Estocada\n2) Corte Cruzado\n3) Distraer\n");
+                *message = "1) Estocada\n2) Corte Cruzado\n3) Distraer\n";
             } else if (player->type == Doctor){
-                printf("1) Curar\n2) Destello Regenerador\n3) Descarga Vital\n");
+                *message = "1) Curar\n2) Destello Regenerador\n3) Descarga Vital\n";
             } else if (player->type == Hacker){
-                printf("1) Inyección SQL\n2) Ataque DDOS\n3)Fuerza Bruta\n");
+                *message = "1) Inyección SQL\n2) Ataque DDOS\n3)Fuerza Bruta\n";
             }
-            scanf("%i",&i);
-            player->current_skill = i - 1;
+            // scanf("%i",&i);
+            server_send_message(player->socket, 97, *message);
+            char* response = server_receive_payload(player->socket);
+            player->current_skill = atoi(response[0]) - 1; // Aquí asumimos que el usuario responde un input válido
             if (player->type == Doctor){
                 if (player->current_skill == 0){
-                    printf("---Elegir Objetivo---\n"); /* Hay que cachar si las habilidades se puede aplicar a uno mismo*/
-                    for (int j = 0; j < n_players;j++){
-                        printf("%i) Jugador %i\n", j + 1, j +1);
-                    }
-                    scanf("%i",&i);
-                    player->current_target = i - 1;
+                    // printf("---Elegir Objetivo---\n"); /* Hay que cachar si las habilidades se puede aplicar a uno mismo*/
+                    // for (int j = 0; j < n_players;j++){
+                    //     printf("%i) Jugador %i\n", j + 1, j +1);
+                    // }
+
+                    // scanf("%i",&i);
+                    sprintf(message, "%d", n_players); // Convertimos la cantidad de jugadores en un string para mandarlo como mensaje
+                    server_send_message(player->socket, 95, *message);
+                    char* response = server_receive_payload(player->socket);
+                    player->current_target = atoi(response[0]) - 1; // Aquí asumimos que el usuario responde un input válido
                 }
                 else if (player->current_skill == 1){
                     //elegir jugador al azar
@@ -183,11 +197,13 @@ int turn_choices(Game* game, int player_turn, int n_players){
                 }
             } else if (player->type == Hacker){
                 if(player->current_skill == 0){
-                    printf("---Elegir Objetivo---\n"); /* Hay que cachar si las habilidades se puede aplicar a uno mismo*/
-                    for (int j = 0; j < n_players;j++){
-                        printf("%i) Jugador %i\n", j + 1, j +1);
-                    }
-                    scanf("%i",&i);
+                    // printf("---Elegir Objetivo---\n"); /* Hay que cachar si las habilidades se puede aplicar a uno mismo*/
+                    // for (int j = 0; j < n_players;j++){
+                    //     printf("%i) Jugador %i\n", j + 1, j +1);
+                    // }
+                    // scanf("%i",&i);
+                    sprintf(message, "%d", n_players); // Convertimos la cantidad de jugadores en un string para mandarlo como mensaje
+                    server_send_message(player->socket, 95, *message);
                     player->current_target = i - 1;
                 }
             }
