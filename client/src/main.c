@@ -31,13 +31,13 @@ int main (int argc, char *argv[]){
 
     if (msg_code == 1) { //Recibimos un mensaje del servidor
       char * message = client_receive_payload(server_socket);
-      printf("El servidor dice: %s\n", message);
+      printf("%s\n", message);
       free(message);
     }
 
     if (msg_code == 2) { //Recibimos un mensaje que proviene del otro cliente
       char * message = client_receive_payload(server_socket);
-      printf("El otro cliente dice: %s\n", message);
+      printf("%s\n", message);
       free(message);
 
       printf("Ingrese su nombre:\n");
@@ -48,23 +48,41 @@ int main (int argc, char *argv[]){
       printf("(3) Hacker\n");
       printf("Ingrese el numero de la clase de su personaje:\n");
       char * class = get_input();
-
       char buf[256];
       snprintf(buf, sizeof(buf), "%s|%s", name, class);
-
       client_send_message(server_socket, 2, buf);
+      free(class);
+      free(name);
+      free(buf);
     }
 
     if (msg_code == 3) { //Recibimos un mensaje que proviene del otro cliente
       char * message = client_receive_payload(server_socket);
-      printf("El otro cliente dice: %s\n", message);
+      printf("%s\n", message);
       free(message);
 
       printf("Ingresa cualquier caracter para comenzar el juego:\n");
       char * x = get_input();
-
       client_send_message(server_socket, 3, x);
+      free(message);
+      free(x);
     }
+
+    if (msg_code == 55) { //Recibimos un mensaje que proviene del otro cliente
+      char * message = client_receive_payload(server_socket);
+      printf("%s\n", message);
+      free(message);
+
+      printf("(1) Great JagRuz\n");
+      printf("(2) Ruzalos \n");
+      printf("(3) Ruiz, el Gemelo Malvado del Profesor Ruz\n");
+      printf("(4) Mounstro Random\n");
+      printf("Ingrese el numero correspondiente al mounstro que quieren combatir:\n");
+      char * x = get_input();
+      client_send_message(server_socket, 55, x);
+      free(x);
+    }
+
   }
 
   // Se cierra el socket

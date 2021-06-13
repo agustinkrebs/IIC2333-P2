@@ -9,7 +9,7 @@ typedef struct game {
   int rounds;
 } Game;
 
-Player* create_new_player();
+Player* create_new_player(Player* player, int class);
 int turn_choices(Game* game, int player_turn, int n_players);
 void choose_monster(Game* game, int selection);
 void choose_player_type(Player* player);

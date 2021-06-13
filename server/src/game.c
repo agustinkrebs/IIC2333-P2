@@ -62,29 +62,10 @@ void choose_player_type(Player* player){
     player->turns_with_x2 = 0;
 } 
 
-Player* create_new_player() {
-    Player* player = malloc(sizeof(Player));
-    int class;
-    printf("--- Bienvenido a Monster Hunt Ruz! --- \n");
-    printf("Introduzca su nombre: ");
-    scanf("%s", player->name);
-    printf("%s estas son las clases disponibles:\n", player->name);
-    printf("1) Cazador\n");
-    printf("2) Medico\n");
-    printf("3) Hacker\n");
-    printf("Selecciona la clase con la que quieres jugar: \n");
-    scanf("%i", &class);
+Player* create_new_player(Player* player, int class) {
+
     player->type = class - 1;
-    while(player->type < 0  || player->type > 2){
-        printf("Debes seleccionar una clase disponible\n");
-        printf("%s estas son las clases disponibles:\n", player->name);
-        printf("1) Cazador\n");
-        printf("2) Medico\n");
-        printf("3) Hacker\n");
-        printf("Selecciona la clase con la que quieres jugar: \n");
-        scanf("%i", &class);
-        player->type = class - 1;
-    }
+
     if (player->type == Hunter) {
         player->life = 5000;
         player->current_life = 5000;
