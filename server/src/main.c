@@ -8,24 +8,28 @@
 
 int N_PLAYERS = 4;
 
-//////////////////////////////////// CODIGOS DE ENVIO DEL SERVIDOR
+//////////////////////////////////// CODIGOS DE ENVIO DEL SERVIDOR HACIA EL CLIENTE
 
 /*
 (1) Mensaje de texto (no espera respuesta)
 (2) Ingresar datos personales de juego
 (3) Tienes la facultad de comenzar el juego
-
 (55) Ingresa elección de monstruo
+(99) Notificar a un cliente de que empezó su turno y preguntarle si desea retirarse.
+(97) Solicitarle al cliente que debe elegir su habilidad para hacer daño.
+(95) Doctor o Hacker: elegir a otro jugador sobre el cual aplicar el poder selecciondo
 
 */
 
-//////////////////////////////////// CODIGOS DE ENVIO DEL CLIENTE
+//////////////////////////////////// CODIGOS DE ENVIO DEL CLIENTE HACIA EL SERVIDOR
 
 /*
 (2) Se envían datos del juego
 (3) Quiero comenzar el juego
-
 (55) Recepción de monstruo elegido
+(98) Elección de si quiere retirarse o no en este turno
+(96) Elección del poder a utilizar
+(94) Doctor: Elección del jugador elegido para sanar
 */
 
 int prepare_socket(char * IP, int port);
@@ -34,8 +38,7 @@ int add_client(int server_socket);
 void choose_monster(Game* game, int selection);
 
 int main(int argc, char *argv[]){
-
-//  struct player players[4];
+  // Ejemplo de input de consola: ./server -i 0.0.0.0 -p tcp_8080
   
   Game* game = malloc(sizeof(Game));
   
@@ -48,11 +51,14 @@ int main(int argc, char *argv[]){
   game->monster = malloc(sizeof(Monster));
 
   // Se define una IP y un puerto
-  char * IP = "0.0.0.0";
-  int PORT = 8080;
+  char * IP = argv[2];
+  int PORT = atoi(argv[4]);
+
+  printf("main | ip_address: %s\n", argv[2]);
+  printf("main | tcp_port: %s\n", argv[4]);
 
   // Se crea un mensaje generico
-  char *message[1000000];
+  char *message[255];
   char *name[20];
   char *clase[20];
 
@@ -178,7 +184,7 @@ int main(int argc, char *argv[]){
           }
 
           if (msg_code == 55){
-            // Se recibe la elección del mounstro
+            // Se recibe la elección del monstruo
             char * client_message = server_receive_payload(i);
             printf("Se recepciona la elección del monstruo\n");
             int monster = atoi(client_message);
@@ -209,10 +215,6 @@ int main(int argc, char *argv[]){
     if (attention == 4){
       attention = 0;
     }
-  }
-
-  while (1) {
-    ;
   }
 
   int turn = 0;

@@ -4,7 +4,7 @@
 #include "comunication.h"
 
 char * get_input(){
-  char * response = malloc(20);
+  char * response = malloc(255);
   int pos=0;
   while (1){
     char c = getchar();
@@ -18,9 +18,14 @@ char * get_input(){
 
 
 int main (int argc, char *argv[]){
+  // Ejemplo de input de consola: ./client -i 0.0.0.0 -p tcp_8080
+
   //Se obtiene la ip y el puerto donde está escuchando el servidor (la ip y puerto de este cliente da igual)
-  char * IP = "0.0.0.0";
-  int PORT = 8080;
+  char * IP = argv[2];
+  int PORT = argv[4];
+
+  printf("main | ip_address: %s\n", argv[2]);
+  printf("main | tcp_port: %s\n", argv[4]);
 
   // Se prepara el socket
   int server_socket = prepare_socket(IP, PORT);
@@ -78,11 +83,41 @@ int main (int argc, char *argv[]){
       printf("(3) Ruiz, el Gemelo Malvado del Profesor Ruz\n");
       printf("(4) Mounstro Random\n");
       printf("Ingrese el numero correspondiente al mounstro que quieren combatir:\n");
-      char * x = get_input();
-      client_send_message(server_socket, 55, x);
-      free(x);
+      char * response = get_input();
+      client_send_message(server_socket, 55, response);
+      free(response);
     }
 
+    if (msg_code == 99) { 
+      printf("¿ Deseas rendirte ?\n");
+      printf("Presiona -1 si quieres rendirte. Cualquier otro número en caso contrario\n");
+      char * response = get_input();
+      client_send_message(server_socket, 98, response);
+      free(response);
+    }
+
+    if (msg_code == 97) { 
+      char * message = client_receive_payload(server_socket);
+      printf("---Elegir Habilidad---\n");
+      printf("%s", message);
+      free(message);
+      char * response = get_input();
+      client_send_message(server_socket, 96, response);
+      free(response);
+    }
+
+    if (msg_code == 95) { 
+      char * message = client_receive_payload(server_socket);
+      int n_players = atoi(message);
+      printf("---Elegir Objetivo---\n"); /* Hay que cachar si las habilidades se puede aplicar a uno mismo*/
+      for (int j = 0; j < n_players; j++){
+          printf("%i) Jugador %i\n", j + 1, j +1);
+      }
+      free(message);
+      char * response = get_input();
+      client_send_message(server_socket, 94, response);
+      free(response);
+    }
   }
 
   // Se cierra el socket
