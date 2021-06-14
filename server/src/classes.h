@@ -18,6 +18,7 @@ typedef struct player {
   int venom_damage;
   int current_skill;
   int current_target;
+  int blood;
 } Player;
 
 typedef struct monster {
@@ -29,6 +30,7 @@ typedef struct monster {
   int brute_force;
   int ddos;
   int ddos_counter;
+  int blood;
   bool distracted;
   Player* player_distracted;
 } Monster;

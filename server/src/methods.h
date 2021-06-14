@@ -75,7 +75,7 @@ void use_poisonous_thorn(Monster* monster, Player* player);
 /*---Ruiz---*/
 
 /* Caso Copia */
-void use_copy_case(Monster* monster, Player* player);
+void use_copy_case(Monster* monster, Player* player, int rounds);
 
 /* Reprobaton-9000 */
 void use_reprobaton_9000(Monster* monster, Player* player);

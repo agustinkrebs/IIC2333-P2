@@ -201,39 +201,56 @@ void use_poisonous_thorn(Monster* monster, Player* player){
 /*---Ruiz---*/
 
 /* Caso Copia */
-void use_copy_case(Monster* monster, Player* player){
-  int random = generate_random(0,7);
-  if (random == 0){/* Estocada */
-    printf("Monstruo aplica una ESTOCADA a %s\n", player->name);
-    update_player_life(player, monster->ddos ? -1000 * 2 : -1000); /* -1000, no se si aplicar lo de los  -500 por cada turno */
-  } else if (random == 1){/* Corte Cruzado */
-    printf("Monstruo aplica un CORTE CRUZADO a %s\n", player->name);
-    update_player_life(player, monster->ddos ? -3000 * 2 : -3000);
-  } else if  (random == 2){/* Curar */
-    printf("Monstruo se cura\n");
+void use_copy_case(Monster* monster, Player* player, int rounds){
+  int attack;
+  printf("COPY CASE sobre %s\n", player->name);
+  int random = generate_random(0,8);
+  if (random == 0){/* Estocada TESTED*/
+    monster->blood ++;
+    if (monster->blood <=3){
+      player->blood ++;
+      printf("%s sangra %i\n",player->name,player->blood);
+    }
+    attack = -1000;
+    attack = monster->ddos ? - attack * 2 : - attack;
+    printf("Monstruo aplica una ESTOCADA a %s con daño %i\n", player->name, attack);
+    update_player_life(player, attack + player->blood * 500); 
+  } else if (random == 1){/* Corte Cruzado TESTED*/
+    attack  = monster->ddos ? -3000 * 2 : -3000;
+    printf("Monstruo aplica un CORTE CRUZADO a %s con daño %i\n", player->name, attack);
+    update_player_life(player, attack + player->blood * 500);
+  } else if  (random == 2){/* Curar TESTED*/
+    printf("Monstruo aplica CURAR y aumenta su vida en 2000\n");
     increase_monster_life(monster, 2000);
-  } else if (random == 3){/* Destello Regenerador */
-    int attack = generate_random(750, 2000);
-    printf("Monstruo aplica un DESTELLO REGENERADOR\n");
-    update_player_life(player, monster->ddos ? - attack * 2: - attack);
-    increase_monster_life(monster, (int) attack/2 + attack % 2);
-  } else if (random == 4){
-    printf("Monstruo aplica una DESCARGA VITAL\n");
-    update_player_life(player, monster->ddos ? -2 * (monster->life - monster->current_life) * 2 : -2 * (monster->life - monster->current_life));
-  } else if (random == 5){
+  } else if (random == 3){/* Destello Regenerador TESTED*/
+    random = generate_random(750, 2000);
+    attack = monster->ddos ? - random * 2: - random;
+    printf("Monstruo aplica un DESTELLO REGENERADOR a %s con daño %i y aumenta su vida en %i\n",player->name, attack, (int) random/2 + random % 2);
+    update_player_life(player, attack + player->blood * 500);
+    increase_monster_life(monster, (int) random/2 + random % 2);
+  } else if (random == 4){/* Descarga Vital TESTED*/
+    attack = monster->ddos ? -2 * (monster->life - monster->current_life) * 2 : -2 * (monster->life - monster->current_life);
+    printf("Monstruo aplica una DESCARGA VITAL a %s con daño %i\n",player->name, attack);
+    update_player_life(player, attack + player->blood * 500);
+  } else if (random == 5){/* Inyeccion SQL TESTED*/
     printf("Monstruo aplica una INYECCIÓN SQL\n");
     monster->ddos_counter = 2;
     monster->ddos = 1;
-  } else if (random == 6){
-    printf("Monstruo aplica un ATAQUE DDOS\n");
-    update_player_life(player, monster->ddos ?  -1500 * 2: - 1500);
-  } else if (random == 7){
+  } else if (random == 6){/* Ataque DDOS TESTED*/
+    attack = monster->ddos ?  -1500 * 2: - 1500;
+    printf("Monstruo aplica un ATAQUE DDOS a %s con daño %i\n",player->name, attack);
+    update_player_life(player, attack + player->blood * 500);
+  } else if (random == 7){/* Fuerza Bruta TESTED*/
     printf("Monstruo aplica FUERZA BRUTA\n");
     monster->brute_force ++;
     if (monster->brute_force == 3){
-      update_player_life(player, monster->ddos ? - 10000 * 2 : - 10000);
+      attack = monster->ddos ? - 10000 * 2 : - 10000;
+      printf("Monstruo aplica esta habilidad por tercera vez con un daño de %i a %s\n",attack, player->name);
+      update_player_life(player, attack + player->blood * 500);
       monster->brute_force = 0;
     }
+  } else {/* Distraer TESTED*/
+    printf("Monstruo aplica DISTRAER (NO HACE NADA)\n");
   }
   monster_check_ddos(monster);
 };
@@ -252,7 +269,7 @@ void use_sudo_rm(Monster* monster, Player** players, int n_players, int rounds){
   for (int i = 0; i < n_players; i++){
     Player* player = players[i];
     if (!player->retired){
-      update_player_life(player, attack);
+      update_player_life(player, attack + player->blood * 500);
     }
   }
   monster_check_ddos(monster);
