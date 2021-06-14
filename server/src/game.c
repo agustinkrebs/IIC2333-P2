@@ -30,6 +30,9 @@ void choose_monster(Game* game, int selection){
     monster->n_of_stabs = 0;
     monster->used_jump = 0;
     monster->distracted = false;
+    monster->brute_force = 0;
+    monster->ddos = 0;  
+    monster->ddos_counter = 0;
     game->monster = monster;
 };
 
@@ -300,11 +303,11 @@ void use_monster_skills(Game* game){
     else {
         if (prob < 40) {
             Player* selected_player_skill = get_random_player(game);
-            use_copy_case(selected_player);
+            use_copy_case(game->monster, selected_player);
         } else if (prob < 60){
-            use_reprobaton_9000(selected_player);
+            use_reprobaton_9000(game->monster, selected_player);
         } else {
-            use_sudo_rm(game->players, game->n_players, game->rounds);
+            use_sudo_rm(game->monster, game->players, game->n_players, game->rounds);
         }
     }
 }

@@ -26,6 +26,9 @@ typedef struct monster {
   int current_life;
   int n_of_stabs;
   int used_jump;
+  int brute_force;
+  int ddos;
+  int ddos_counter;
   bool distracted;
   Player* player_distracted;
 } Monster;
