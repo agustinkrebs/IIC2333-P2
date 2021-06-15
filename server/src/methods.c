@@ -72,18 +72,17 @@ int get_damage(Player* player, int value){
 /*---Skills de Cazador---*/
 
 /* Estocada */
-int use_lunge(Player* player, Monster* monster){
+void use_lunge(Player* player, Monster* monster){
   //en este caso estocada retorna exito si el mountro todavia no tiene estocadas, sino fracaso para que el jugador pueda seleccionar otra habilidad.
   int hurt = get_damage(player, 1000);
+  reduce_monster_life(monster, hurt);
+  printf("%s le infringe una estocado al mounstro\n", player->name);
   if (monster->n_of_stabs < 3){
     monster->n_of_stabs ++;
-    reduce_monster_life(monster, hurt);
-    printf("%s le infringe una estocado al mounstro\n", player->name);
-    return 1;
+    printf("Mounstro queda con %i estocadas\n", monster->n_of_stabs);
   }
   else {
-    printf("Mounstro ya tiene 3 estocadas\n");
-    return 0;
+    printf("Mounstro ya tenía 3 estocadas\n");
   }
 };
 

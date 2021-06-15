@@ -163,7 +163,7 @@ int turn_choices(Game* game, int player_turn, int n_players){
             }
             printf("\n---Situación del monstruo---\n");
             printf("Monstruo -> Vida %i / %i\n", game->monster->current_life, game->monster->life);
-
+            printf("\n-----------------------------------\n");
         }
         Player* player = game->players[player_turn % n_players];
         if (player->current_life > 0 && !player->retired) {
@@ -217,11 +217,7 @@ int turn_choices(Game* game, int player_turn, int n_players){
 void use_skills(Player* player, Game* game){
     if (player->type == Hunter){
         if (player->current_skill == 0) {
-            int succes = use_lunge(player, game->monster);
-            if (!succes) {
-                choose_skills(player);
-                use_skills(player, game);
-            }
+            use_lunge(player, game->monster);
         }
         else if (player->current_skill == 1) {
             use_cross_cut(player, game->monster);

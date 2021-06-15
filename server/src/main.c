@@ -4,7 +4,7 @@
 #include "conection.h"
 #include "game.h"
 
-int N_PLAYERS = 2;
+int N_PLAYERS = 4;
 
 int main(int argc, char *argv[]){
   int turn;

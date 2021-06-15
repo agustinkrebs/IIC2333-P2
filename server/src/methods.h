@@ -17,7 +17,7 @@ void update_player_life(Player* player, int value);
 /*---Skills de Cazador---*/
 
 /* Estocada */
-int use_lunge(Player* player, Monster* monster);
+void use_lunge(Player* player, Monster* monster);
 
 /* Corte Cruzado */
 void use_cross_cut(Player* player, Monster* monster);
