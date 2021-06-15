@@ -20,6 +20,7 @@ int main(int argc, char *argv[]){
     game->players_connected = 0;
     game->rounds = 0;
     game->monster = malloc(sizeof(Monster));
+    game->monster->current_life = -1;
     for (int i = 0; i < N_PLAYERS; i++){
       game->players[i] = create_new_player();
     }
@@ -30,15 +31,18 @@ int main(int argc, char *argv[]){
         printf("\n\n------------ Turno de jugador %s ----------------\n\n", game->players[turn]->name);
         turn_value = turn_choices(game, turn, N_PLAYERS);
         choose_monster(game, turn_value);
-      } else {
+      }
+     else {
         for (int turn = 0; turn < game->n_players; turn++){
           if (!game->players[turn]->retired){
             printf("\n\n------------ Turno de jugador %s ----------------\n\n", game->players[turn]->name);
             turn_value = turn_choices(game, turn, N_PLAYERS);
           }
         }
-        printf("\n\n------------ Turno de monstruo ----------------\n\n");
-        use_monster_skills(game);
+        if (game->remaining_players){
+          printf("\n\n------------ Turno de monstruo ----------------\n\n");
+          use_monster_skills(game);
+        }
       }
       /* Hacer algo con current_skill y current_target seteado en el jugador del turno*/
       if (game->remaining_players && game->monster->current_life) {
@@ -56,6 +60,7 @@ int main(int argc, char *argv[]){
     for (int i = 0; i < N_PLAYERS; i++){
       free(game->players[i]);
     }
+    free(game->players);
     free(game->monster);
     free(game);
     printf("Volver a jugar:\n1)Si\n2)No\n"); /*Aca mas que nada se deberia ver si se termina la conexion con el socket */
