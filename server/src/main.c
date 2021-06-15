@@ -14,6 +14,7 @@ int N_PLAYERS = 4;
 (1) Mensaje de texto (no espera respuesta)
 (2) Ingresar datos personales de juego
 (3) Tienes la facultad de comenzar el juego
+(4) Líder: Recibir estado del resto de los jugadores
 (55) Ingresa elección de monstruo
 (99) Notificar a un cliente de que empezó su turno y preguntarle si desea retirarse.
 (97) Solicitarle al cliente que debe elegir su habilidad para hacer daño.
@@ -62,8 +63,8 @@ int main(int argc, char *argv[]){
     char * IP = "0.0.0.0";
     int PORT = 8080;
 
-    printf("main | ip_address: %s\n", argv[2]);
-    printf("main | tcp_port: %s\n", argv[4]);
+    printf("SERVER: main | ip_address: %s\n", argv[2]);
+    printf("SERVER: main | tcp_port: %s\n", argv[4]);
 
     // Se crea un mensaje generico
     char *message[255];
@@ -80,7 +81,7 @@ int main(int argc, char *argv[]){
     // Se crea el servidor y se obtienen los sockets de ambos clientes.
     int server_socket = prepare_socket(IP, PORT);
     
-    printf("Se comienza a escuchar clientes\n");
+    printf("SERVER: main | Se comienza a escuchar clientes\n");
     
 
     fd_set current_sockets, ready_sockets;
@@ -88,7 +89,7 @@ int main(int argc, char *argv[]){
     FD_SET(server_socket, &current_sockets);
 
     while (lobby){
-      printf("Estamos en el lobby\n");
+      printf("SERVER: main | Estamos en el lobby\n");
       ready_sockets = current_sockets;
       if (select(FD_SETSIZE, &ready_sockets, NULL, NULL, NULL) < 0){
         exit(-1);
@@ -136,11 +137,11 @@ int main(int argc, char *argv[]){
               char * client_message = server_receive_payload(i);
               if (client_message){
                 char * token = strtok(client_message, "|");
-                printf("%s\n", token);
                 *game->players[found]->name = *token;
+                printf("SERVER: main | NAME: %s\n", game->players[found]->name);
                 *name = token;
                 token = strtok(NULL, " ");
-                printf("%s\n", token);
+                printf("SERVER: main | CLASS: %s\n", token);
                 int class_preference = atoi(token);
                 char class_preference_name[20];
                 game->players[found] = create_new_player(game->players[found], class_preference);
@@ -152,7 +153,7 @@ int main(int argc, char *argv[]){
                     strcpy(class_preference_name, "Hacker");
                 }
                 registered_clients ++;
-                printf("El cliente %d dice: %s\n", i, client_message);
+                printf("SERVER: main | El cliente %d dice: %s\n", i, client_message);
                 *message = "Tu personaje fue creado! Esperando que se registren los demás jugadores ...\n";
                 server_send_message(game->players[found]->socket, 1, *message);
                 if (found == 0){
@@ -179,9 +180,9 @@ int main(int argc, char *argv[]){
             // Caso en que el usuario quiera empezar el juego
             if (msg_code == 3){
               char * client_message = server_receive_payload(i);
-              printf("El Jefe quiere comenzar el juego\n");
+              printf("SERVER: main | El Jefe quiere comenzar el juego\n");
               if (number_clients == registered_clients) {
-                printf("Se procede a preguntarle al lider qué monstruo quiere utilizar!\n");
+                printf("SERVER: main | Se procede a preguntarle al lider qué monstruo quiere utilizar!\n");
                 *message = "¿Contra qué mounstro quieren luchar? \n";
                 server_send_message(game->players[0]->socket, 55, *message);
               } else {
@@ -194,10 +195,10 @@ int main(int argc, char *argv[]){
             if (msg_code == 55){
               // Se recibe la elección del monstruo
               char * client_message = server_receive_payload(i);
-              printf("Se recepciona la elección del monstruo\n");
+              printf("SERVER: main | Se recepciona la elección del monstruo\n");
               int monster = atoi(client_message);
               choose_monster(game, monster);
-              printf("Comienza el juego!\n");
+              printf("SERVER: main | Comienza el juego!\n");
               *message = "Comienza el juego!\n";
               for (i = 0; i < number_clients; i ++) {
                 server_send_message(game->players[i]->socket, 1, *message);
@@ -217,13 +218,14 @@ int main(int argc, char *argv[]){
     while((game->remaining_players && game->monster->current_life) || !game->rounds){
       if (game->rounds){
         for (int turn = 0; turn < game->n_players; turn++){
+          printf("SERVER: main | turn: %i\n", turn);
           if (!game->players[turn]->retired){
-            printf("\n\n------------ Turno de jugador %s ----------------\n\n", game->players[turn]->name);
+            printf("SERVER: main | \n\n------------ Turno de jugador %s ----------------\n\n", game->players[turn]->name);
             turn_value = turn_choices(game, turn, N_PLAYERS);
           }
         }
         if (game->remaining_players){
-          printf("\n\n------------ Turno de monstruo ----------------\n\n");
+          printf("SERVER: main | \n\n------------ Turno de monstruo ----------------\n\n");
           use_monster_skills(game);
         }
         /* Hacer algo con current_skill y current_target seteado en el jugador del turno*/
@@ -231,13 +233,13 @@ int main(int argc, char *argv[]){
           update_round(game);
         }
         if (game->remaining_players == 0 ) {
-          printf("No quedan jugadores. Monstruo gano\n");
+          printf("SERVER: main | No quedan jugadores. Monstruo gano\n");
         }
         else{
-          printf("Felicidades! Han logrado vencer al monstruo\n");
+          printf("SERVER: main | Felicidades! Han logrado vencer al monstruo\n");
         }
-        game->rounds ++;
       }
+      game->rounds ++;
     }
     /* Liberar memoria */
     for (int i = 0; i < N_PLAYERS; i++){
@@ -250,8 +252,8 @@ int main(int argc, char *argv[]){
     free(game->players);
     free(game->monster);
     free(game);
-    printf("Volver a jugar:\n1)Si\n2)No\n"); /*Aca mas que nada se deberia ver si se termina la conexion con el socket */
-    scanf("%i",&play);
+    printf("SERVER: main | Volver a jugar:\n1)Si\n2)No\n"); /*Aca mas que nada se deberia ver si se termina la conexion con el socket */
+    scanf("SERVER: main | %i",&play);
     if (play != 1){
       break;
     }
