@@ -11,6 +11,7 @@ void use_doctor_skills(Player* player);
 void use_hackers_skills(Player* player);
 
 void reduce_monster_life(Monster* monster, int hurt);
+void increase_monster_life(Monster* monster, int value);
 void update_player_life(Player* player, int value);
 
 /*---Skills de Cazador---*/
@@ -74,10 +75,10 @@ void use_poisonous_thorn(Monster* monster, Player* player);
 /*---Ruiz---*/
 
 /* Caso Copia */
-void use_copy_case(Player* player);
+void use_copy_case(Monster* monster, Player* player, int rounds);
 
 /* Reprobaton-9000 */
-void use_reprobaton_9000(Player* player);
+void use_reprobaton_9000(Monster* monster, Player* player);
 
 /* sudo rm -rf */
-void use_sudo_rm();
+void use_sudo_rm(Monster* monster, Player** players, int n_players, int rounds);
