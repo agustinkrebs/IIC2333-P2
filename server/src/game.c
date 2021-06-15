@@ -10,7 +10,7 @@ int player_life[] = {5000, 3000, 2500};
 int monster_life[] = {10000, 20000, 25000};
 
 void choose_monster(Game* game, int selection){
-    Monster* monster = malloc(sizeof(Monster));
+    Monster* monster = game->monster;
     if (selection == 4) {
         printf("Seleccionando monstruo al azar...\n");
         selection = generate_random(1,3);
@@ -34,38 +34,9 @@ void choose_monster(Game* game, int selection){
     monster->ddos = 0;  
     monster->ddos_counter = 0;
     monster->blood = 0;
+    monster->player_distracted = NULL;
     game->monster = monster;
 };
-
-//ESTA FUNCION LA PODEMOS SACAR
-void choose_player_type(Player* player){
-    int selection;
-    printf("---Inicio de Juego---\n");
-    printf("Tipos:\n");
-    printf("1) Cazador\n");
-    printf("2) Médico\n");
-    printf("3) Hacker\n");
-    printf("Selecciona tu personaje:\n");
-    scanf("%i", &selection);
-    if (selection == 1){
-        player->type = Hunter;
-        printf("\nHas seleccionado Cazador con %i de vida\n\n", player_life[selection - 1]);
-    } else if (selection == 2){
-        player->type = Ruzalos;
-        printf("\nHas seleccionado Médico con %i de vida\n\n", player_life[selection - 1]);
-    } else if (selection == 3){
-        player->type = Ruiz;
-        printf("\nHas seleccionado Hacker con %i de vida\n\n", player_life[selection - 1]);
-    }
-    player->life = player_life[selection - 1];
-    player->brute_force = 0;
-    player->current_life = player_life[selection - 1];
-    player->current_skill = 0;
-    player->current_target = 0;
-    player->is_reprobate = 0;
-    player->rounds_with_spine = 0;
-    player->turns_with_x2 = 0;
-} 
 
 Player* create_new_player() {
     Player* player = malloc(sizeof(Player));
@@ -174,7 +145,7 @@ int turn_choices(Game* game, int player_turn, int n_players){
             if (i == -1) {
                 player->retired = true;
                 printf("%s se ha retirado del juego", player->name);
-                game->remaining_players -= 1;
+                game->remaining_players --;
                 return i;
             };
             choose_skills(player);
@@ -200,10 +171,10 @@ int turn_choices(Game* game, int player_turn, int n_players){
             } else if (player->type == Hacker){
                 if(player->current_skill == 0){
                     printf("---Elegir Objetivo---\n"); /* Hay que cachar si las habilidades se puede aplicar a uno mismo*/
-                    for (int j = 0; j < n_players;j++){
+                    for (int j = 0; j < n_players; j++){
                         printf("%i) Jugador %s\n", j + 1, game->players[j]->name);
                     }
-                    scanf("%i",&i);
+                    scanf("%i", &i);
                     player->current_target = i - 1;
                 }
             }

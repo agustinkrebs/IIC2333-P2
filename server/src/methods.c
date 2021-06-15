@@ -9,6 +9,9 @@ void use_doctor_skills(Player* player);
 void use_hackers_skills(Player* player);
 
 int generate_random (int lower, int upper) {
+  if (upper - lower <= 0){
+    return lower;
+  }
   int random = (rand()) % (upper - lower);
   int number = random + lower;
   return number;
@@ -40,6 +43,7 @@ void monster_check_ddos(Monster* monster){
     }
   }
 }
+
 void update_player_life(Player* player, int value){
   if (value > 0){
     player->current_life += value;
