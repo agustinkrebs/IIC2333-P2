@@ -104,8 +104,10 @@ int turn_choices(Game* game, int player_turn, int n_players){
     6) se retorna cero
     */
     int i;
-    char* message[255];
-    char* response[255];
+    // char message[255];
+    char* message = malloc(256);
+    // char* response = malloc(256);
+    // char response[255];
     if (!game->rounds) {
         /*
         printf("---Inicio de Juego---\n");
@@ -117,12 +119,13 @@ int turn_choices(Game* game, int player_turn, int n_players){
         printf("Lider selecciona el monstruo con el que deseas combatir:\n");
         scanf("%i",&i);
         */
+        free(message);
         return i;
     } else {
         Player* player = game->players[player_turn % n_players];
         if (!(player_turn % n_players)) {
-            *message = "";
-            server_send_message(player->socket, 4, *message);
+            strcpy(message, "");
+            server_send_message(player->socket, 4, message);
             printf("SERVER: turn_choices | Turno del líder\n");
             /*
             printf("Turno del líder\n");
@@ -143,34 +146,44 @@ int turn_choices(Game* game, int player_turn, int n_players){
         }
         if (player->current_life > 0 && !player->retired) {
             printf("SERVER: turn_choices | Turno de %s \n", player->name);
+            strcpy(message, "");
+            server_send_message(player->socket, 99, message);
             printf("SERVER: turn_choices | Esperando para ver si quiere retirarse o continuar jugando\n");
             /*
             printf("¿ Deseas rendirte ?\n");
             printf("Presiona -1 si quieres rendirte. Cualquier otro número en caso contrario\n");
             scanf("%i", &i);
             */
-            *message = "";
-            server_send_message(player->socket, 99, *message);
-            *response = server_receive_payload(player->socket);
-            if (strcmp(response, "-1") == 0) {
+            char* response = server_receive_payload(player->socket);
+            printf("Response: %s\n", response);
+            // printf("response[0]: -%c-\n", response[0]);
+            // printf("response[1]: %c\n", response[1]);
+            // printf("response[2]: %c\n", response[2]);
+            if (response[1] == '-' && response[2] == '1') {
+                free(response);
                 player->retired = true;
-                printf("SERVER: turn_choices | %s se ha retirado del juego", player->name);
+                printf("SERVER: turn_choices | %s se ha retirado del juego\n", player->name);
                 game->remaining_players --;
+                free(message);
                 return i;
             };
+            free(response);
+            printf("SERVER: turn_choices | Jugador decide continuar jugando\n");
             // choose_skills(player);
             // printf("---Elegir Habilidad---\n");
             if (player->type == Hunter){
-                *message = "1) Estocada\n2) Corte Cruzado\n3) Distraer\n";
+                strcpy(message, "1) Estocada\n2) Corte Cruzado\n3) Distraer\n");
             } else if (player->type == Doctor){
-                *message = "1) Curar\n2) Destello Regenerador\n3) Descarga Vital\n";
+                strcpy(message, "1) Curar\n2) Destello Regenerador\n3) Descarga Vital\n");
             } else if (player->type == Hacker){
-                *message = "1) Inyección SQL\n2) Ataque DDOS\n3)Fuerza Bruta\n";
+                strcpy(message, "1) Inyección SQL\n2) Ataque DDOS\n3)Fuerza Bruta\n");
             }
             // scanf("%i",&i);
-            server_send_message(player->socket, 97, *message);
-            *response = server_receive_payload(player->socket);
-            player->current_skill = atoi(response[0]) - 1; // Aquí asumimos que el usuario responde un input válido
+            server_send_message(player->socket, 97, message);
+            char* skill_selection_response = server_receive_payload(player->socket);
+            player->current_skill = skill_selection_response[1] - '0' - 1; // Aquí asumimos que el usuario responde un input válido
+            printf("SERVER: turn_choices | %s ha decidio utilizar habilidad: %i\n", player->name, player->current_skill);
+            free(skill_selection_response);
             if (player->type == Doctor){
                 if (player->current_skill == 0){
                     // printf("---Elegir Objetivo---\n"); /* Hay que cachar si las habilidades se puede aplicar a uno mismo*/
@@ -180,9 +193,10 @@ int turn_choices(Game* game, int player_turn, int n_players){
 
                     // scanf("%i",&i);
                     sprintf(message, "%d", n_players); // Convertimos la cantidad de jugadores en un string para mandarlo como mensaje
-                    server_send_message(player->socket, 95, *message);
+                    server_send_message(player->socket, 95, message);
                     *response = server_receive_payload(player->socket);
                     player->current_target = atoi(response[0]) - 1; // Aquí asumimos que el usuario responde un input válido
+                    free(response);
                 }
                 else if (player->current_skill == 1){
                     //elegir jugador al azar
@@ -200,7 +214,7 @@ int turn_choices(Game* game, int player_turn, int n_players){
                     // }
                     // scanf("%i",&i);
                     sprintf(message, "%d", n_players); // Convertimos la cantidad de jugadores en un string para mandarlo como mensaje
-                    server_send_message(player->socket, 95, *message);
+                    server_send_message(player->socket, 95, message);
                     player->current_target = i - 1;
                 }
             }
@@ -208,6 +222,7 @@ int turn_choices(Game* game, int player_turn, int n_players){
         }
 
     }
+    free(message);
     return 0;
 }
 

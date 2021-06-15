@@ -74,7 +74,7 @@ int add_client(int server_socket){
 
   // Se aceptan a los primeros 2 clientes que lleguen. "accept" retorna el n° de otro socket asignado para la comunicación
   client = accept(server_socket, (struct sockaddr *)&client_addr, &addr_size);
-  printf("add_client | Se ha conectado un cliente de forma existosa\n");
+  printf("SERVER: add_client | Se ha conectado un cliente de forma existosa\n");
 
   return client;
 }

@@ -21,13 +21,15 @@ int main (int argc, char *argv[]){
   // Ejemplo de input de consola: ./client -i 0.0.0.0 -p 8080
 
   //Se obtiene la ip y el puerto donde está escuchando el servidor (la ip y puerto de este cliente da igual)
-  // char * IP = argv[2];
-  // int PORT = atoi(argv[4]);
-  char * IP = "0.0.0.0";
-  int PORT = 8080;
+  char IP[20];
+  strcpy(IP, argv[2]);
+  int PORT = atoi(argv[4]);
+  // char * IP = "0.0.0.0";
+  // int PORT = 8080;
 
-  printf("CLIENT: main | ip_address: %s\n", argv[2]);
-  printf("CLIENT: main | tcp_port: %s\n", argv[4]);
+  printf("CLIENT: main | ip_address: %s\n", IP);
+  printf("CLIENT: main | tcp_port: %i\n", PORT);
+
 
   // Se prepara el socket
   int server_socket = prepare_socket(IP, PORT);
@@ -115,6 +117,7 @@ int main (int argc, char *argv[]){
       printf("CLIENT: main | ¿Deseas rendirte?\n");
       printf("CLIENT: main | Presiona -1 si quieres rendirte. Cualquier otro número en caso contrario\n");
       char * response = get_input();
+      printf("response: %s\n", response);
       client_send_message(server_socket, 98, response);
       //free(response);
     }
