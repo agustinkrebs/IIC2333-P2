@@ -76,73 +76,22 @@ int main (int argc, char *argv[]){
       //free(x);
     }
 
-    if (msg_code == 4) {
-      char * message = client_receive_payload(server_socket);
-      int n_players = atoi(message);
-      printf("CLIENT: main | ---Situación de los Jugadores---\n");
-      /*
-      TODO: Imprimir esta información
-      for (int j = 0; j < n_players; j++) {
-          Player* player_list = game->players[j];
-          if (j == 0) {
-              printf("Lider-%s[%i] -> Vida %i / %i\n", player_list->name, player_list->type, player_list->current_life, player_list->life);
-          }
-          else {
-              printf("%s[%i] -> Vida %i / %i\n", player_list->name, player_list->type, player_list->current_life, player_list->life);
-          }
-      }
-      */
-      printf("CLIENT: main | ---Situación del monstruo---\n");
-      // printf("Monstruo -> Vida %i / %i\n", game->monster->current_life, game->monster->life);
-      printf("CLIENT: main | -----------------------------------\n");
-      //free(message);
-    }
-
-    if (msg_code == 55) {
-      char * message = client_receive_payload(server_socket);
-      printf("CLIENT: main | %s\n", message);
-      //free(message);
-
-      printf("CLIENT: main | (1) Great JagRuz\n");
-      printf("CLIENT: main | (2) Ruzalos \n");
-      printf("CLIENT: main | (3) Ruiz, el Gemelo Malvado del Profesor Ruz\n");
-      printf("CLIENT: main | (4) Mounstro Random\n");
-      printf("CLIENT: main | Ingrese el numero correspondiente al mounstro que quieren combatir:\n");
-      char * response = get_input();
-      client_send_message(server_socket, 55, response);
-      //free(response);
-    }
-
     if (msg_code == 99) { 
+      printf("CLIENT: main | ¡Comenzó tu turno!\n");
       printf("CLIENT: main | ¿Deseas rendirte?\n");
       printf("CLIENT: main | Presiona -1 si quieres rendirte. Cualquier otro número en caso contrario\n");
       char * response = get_input();
-      printf("response: %s\n", response);
-      client_send_message(server_socket, 98, response);
-      //free(response);
-    }
-
-    if (msg_code == 97) { 
-      char * message = client_receive_payload(server_socket);
-      printf("CLIENT: main | ---Elegir Habilidad---\n");
-      printf("CLIENT: main | %s", message);
-      //free(message);
-      char * response = get_input();
-      client_send_message(server_socket, 96, response);
-      //free(response);
-    }
-
-    if (msg_code == 95) { 
-      char * message = client_receive_payload(server_socket);
-      int n_players = atoi(message);
-      printf("CLIENT: main | ---Elegir Objetivo---\n"); /* Hay que cachar si las habilidades se puede aplicar a uno mismo*/
-      for (int j = 0; j < n_players; j++){
-          printf("CLIENT: main | %i) Jugador %i\n", j + 1, j +1);
+      client_send_message(server_socket, 98, response); // el número no importa
+      if (response[0] == '-' && response[1] == '1') {
+        break;
       }
-      //free(message);
+      free(response);
+    }
+
+    if (msg_code == 40) { 
       char * response = get_input();
-      client_send_message(server_socket, 94, response);
-      //free(response);
+      client_send_message(server_socket, 94, response); // el número no importa
+      free(response);
     }
   }
 

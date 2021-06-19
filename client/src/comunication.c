@@ -4,7 +4,7 @@ int client_receive_id(int client_socket){
   // Se obtiene solamente el ID del mensaje
   int id = 0;
   recv(client_socket, &id, 1, 0);
-  printf("CLIENT: client_receive_id | Recibí código de mensaje: %i\n", id);
+  // printf("CLIENT: client_receive_id | Recibí código de mensaje: %i\n", id);
   return id;
 }
 
@@ -16,7 +16,7 @@ char * client_receive_payload(int client_socket){
   char * payload = malloc(len);
   int received = recv(client_socket, payload, len, 0);
   // Se retorna
-  printf("CLIENT: client_receive_payload | Recibí payload: %s\n", payload);
+  // printf("CLIENT: client_receive_payload | Recibí payload: %s\n", payload);
   return payload;
 }
 
@@ -31,5 +31,5 @@ void client_send_message(int client_socket, int pkg_id, char * message){
   memcpy(&msg[2], message, payloadSize);
   // Se envía el paquete
   send(client_socket, msg, 2+payloadSize, 0);
-  printf("CLIENT: client_send_message | Envié código de mensaje: %i\n", pkg_id);
+  // printf("CLIENT: client_send_message | Envié código de mensaje: %i\n", pkg_id);
 }

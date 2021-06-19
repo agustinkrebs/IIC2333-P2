@@ -57,7 +57,7 @@ void update_player_life(Player* player, int value){
     player->current_life += value;
     if (player->current_life < 0){
       player->current_life = 0;
-      player->retired = true;
+      player->is_retired = true;
       printf("SERVER: update_player_life | Jugador %s ha sido eliminado\n", player->name);
     }
   }
@@ -292,7 +292,7 @@ void use_sudo_rm(Monster* monster, Player** players, int n_players, int rounds){
   printf("SERVER: use_sudo_rm | SUDO RM sobre todos los jugadores con daño de %i\n", attack);
   for (int i = 0; i < n_players; i++){
     Player* player = players[i];
-    if (!player->retired){
+    if (!player->is_retired){
       update_player_life(player, attack + player->blood * 500);
     }
   }
