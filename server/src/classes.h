@@ -8,6 +8,7 @@ typedef struct player {
   char name[20];
   bool is_leader;
   bool is_retired;
+  bool already_played;
   int life;
   int type;
   int current_life;

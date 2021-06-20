@@ -41,13 +41,13 @@ int main (int argc, char *argv[]){
     if (msg_code == 1) { //Recibimos un mensaje del servidor
       char * message = client_receive_payload(server_socket);
       printf("CLIENT: main | %s\n", message);
-      //free(message);
+      free(message);
     }
 
     if (msg_code == 2) { 
       char * message = client_receive_payload(server_socket);
       printf("CLIENT: main | %s\n", message);
-      //free(message);
+      free(message);
 
       printf("CLIENT: main | Ingrese su nombre:\n");
       char * name = get_input();
@@ -60,41 +60,44 @@ int main (int argc, char *argv[]){
       char buf[256];
       snprintf(buf, sizeof(buf), "%s|%s", name, class);
       client_send_message(server_socket, 2, buf);
-      //free(class);
-      //free(name);
+      free(class);
+      free(name);
     }
 
     if (msg_code == 3) {
       char * message = client_receive_payload(server_socket);
       printf("CLIENT: main | %s\n", message);
-      //free(message);
+      free(message);
 
       printf("CLIENT: main | Ingresa cualquier caracter para comenzar el juego:\n");
       char * x = get_input();
       client_send_message(server_socket, 3, x);
-      //free(message);
-      //free(x);
+      free(x);
     }
 
     if (msg_code == 99) { 
       printf("CLIENT: main | ¡Comenzó tu turno!\n");
-      printf("CLIENT: main | ¿Deseas rendirte?\n");
-      printf("CLIENT: main | Presiona -1 si quieres rendirte. Cualquier otro número en caso contrario\n");
+      printf("CLIENT: main | ¿Deseas rendirte? Presiona -1 si quieres rendirte. Cualquier otro número en caso contrario\n");
       char * response = get_input();
       client_send_message(server_socket, 98, response); // el número no importa
       if (response[0] == '-' && response[1] == '1') {
+        free(response);
         break;
       }
       free(response);
     }
 
     if (msg_code == 40) { 
+      // Obtenemos el mensaje pero no hacemos nada con el. Si no lo recibimos, no saldrá de la "cola" de mensajes.
+      char * message = client_receive_payload(server_socket);
+      free(message);
+
       char * response = get_input();
       client_send_message(server_socket, 94, response); // el número no importa
       free(response);
     }
   }
-
+  printf("CLIENT: main | ¡Adiós!\n");
   // Se cierra el socket
   close(server_socket);
   //free(IP);
