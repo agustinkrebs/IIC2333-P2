@@ -21,7 +21,7 @@
 
 * Una vez definido la instancia de Game, los diferentes jugadores comienzan la interacción con la consola y a usar sus diferentes skills, los cuales son manejados por una función específica para manejar todas las funciones de habilidades. 
 
-El juego fue implementado de forma que se actualiza el numero de turnos al final de cada ronda cuando se usan los poderes.
+* El juego fue implementado de forma que se actualiza el numero de turnos al final de cada ronda cuando se usan los poderes.
 
 ### Cliente - Servidor
 
