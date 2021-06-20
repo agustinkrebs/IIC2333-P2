@@ -89,25 +89,22 @@ int main (int argc, char *argv[]){
     }
 
     if (msg_code == 40) { 
-      printf("Entre al 40\n");
       char * response = get_input();
-      printf("Sali al 40\n");
       client_send_message(server_socket, 94, response); // el número no importa
       free(response);
     }
 
     if (msg_code == 30) { 
       printf("¿Quieres seguir jugando?\n(1) Sí\n(2) No\n");
-
       char * response = get_input();
-
+      printf("Enviando la respuesta\n");
       client_send_message(server_socket, 94, response); // el número no importa
       free(response);
     }
 
     if (msg_code == 69) { 
       char * message = client_receive_payload(server_socket);
-      printf("CLIENT: main | %s\n", message);
+      printf("CLIENT: main | Adios y que te vaya bien!\n");
       break;
     }
     

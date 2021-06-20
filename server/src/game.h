@@ -10,6 +10,7 @@ typedef struct game {
 } Game;
 
 Player* create_new_player(Player* player, int class);
+Player* get_random_player(Game* game);
 int turn_choices(Game* game, int player_turn);
 void choose_monster(Game* game, int selection);
 void choose_player_type(Player* player);
