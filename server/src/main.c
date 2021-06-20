@@ -18,6 +18,7 @@ int MAX_N_PLAYERS = 4;
 (2) Ingresar datos personales de juego
 (3) Tienes la facultad de comenzar el juego
 (99) Notificar a un cliente de que empezó su turno y preguntarle si desea retirarse.
+(12) Quiere seguir jugando?
 
 */
 
@@ -26,6 +27,8 @@ int MAX_N_PLAYERS = 4;
 /*
 (2) Se envían datos del juego
 (3) Quiero comenzar el juego
+(32) Quiero seguir jugando
+(33) No quiero seguir jugando
 */
 
 int prepare_socket(char * IP, int port);
@@ -220,34 +223,126 @@ int main(int argc, char *argv[]){
       }
     }
 
+    int continue_game_responses = 0;
+    int want_to_play = 1;
+
+    while (want_to_play){
 
 
-    // Como no está inicializado el monstruo se cae al tratar de ver su current life
-    while(game->remaining_players > 0 && game->monster->current_life > 0){
-      for (int turn = 0; turn < game->n_players; turn++){
-          // printf("SERVER: main | TURN: %i\n", turn);
-        if (!game->players[turn]->is_retired){
-          printf("SERVER: main | ------------ Turno de jugador %s ----------------\n", game->players[turn]->name);
-          printf("SERVER: main | IS LEADER: %i\n", game->players[turn]->is_leader);
-          turn_value = turn_choices(game, turn);
+      // Como no está inicializado el monstruo se cae al tratar de ver su current life
+      while(game->remaining_players > 0 && game->monster->current_life > 0){
+        for (int turn = 0; turn < game->n_players; turn++){
+            // printf("SERVER: main | TURN: %i\n", turn);
+          if (!game->players[turn]->is_retired){
+            printf("SERVER: main | ------------ Turno de jugador %s ----------------\n", game->players[turn]->name);
+            printf("SERVER: main | IS LEADER: %i\n", game->players[turn]->is_leader);
+            turn_value = turn_choices(game, turn);
+          }
+        }
+        if (game->remaining_players){
+          printf("SERVER: main | ------------ Turno de monstruo ----------------\n");
+          use_monster_skills(game);
+        }
+        // Hacer algo con current_skill y current_target seteado en el jugador del turno
+        if (game->remaining_players && game->monster->current_life) {
+          update_round(game);
+        }
+        if (game->remaining_players == 0 ) {
+          printf("SERVER: main | No quedan jugadores. Monstruo gano\n");
+        }
+        else if (!game->monster->current_life) {
+          printf("SERVER: main | Felicidades! Han logrado vencer al monstruo\n");
+        }
+        game->rounds ++;
+      }
+
+      
+      for (i = 0; i < number_clients; i++){
+        printf("%i\n", i);
+        printf("%i\n", game->players[i]->is_retired);
+        if (!game->players[i]->is_retired){
+          printf("Estoy enviando un mensaje al jugador\n");
+          
+          server_send_message(game->players[i]->socket, 30, message);
         }
       }
-      if (game->remaining_players){
-        printf("SERVER: main | ------------ Turno de monstruo ----------------\n");
-        use_monster_skills(game);
+
+      continue_game_responses = 0;
+      want_to_play = 0;
+
+      while (continue_game_responses < game->remaining_players) {
+        for (i = 0; i < FD_SETSIZE; i ++){
+          if (FD_ISSET(i, &ready_sockets)) {
+            
+              // Primero debemos saber qué socket me habló
+              int found = 0;
+              for (int k = 0; k < MAX_N_PLAYERS; k++) {
+                if (game->players[k]->socket == i){
+                  found = k;
+                  break;
+                }
+              }
+              int msg_code = server_receive_id(i);
+              char * client_message = server_receive_payload(i);
+
+              printf("%s\n", client_message);
+              printf("%i\n", found);
+              printf("%i\n", game->players[found]->socket);
+              
+              // Caso en que me den los datos para inicializar al jugador
+              if (!strncmp(client_message, "1", 1)){
+                printf("SERVER: main | El usuario quiere seguir jugando\n");
+                  if (game->players[found]->is_leader){
+                    printf("SERVER: main | Se procede a preguntarle al lider qué monstruo quiere utilizar!\n");
+                    strcpy(message, "¿Contra qué monstruo quieren luchar?");
+                    server_send_message(game->players[found]->socket, 1, message);
+                    strcpy(message, "1) Great JagRuz");
+                    server_send_message(game->players[found]->socket, 1, message);
+                    strcpy(message, "2) Ruzalos");
+                    server_send_message(game->players[found]->socket, 1, message);
+                    strcpy(message, "3) Ruiz, el Gemelo Malvado del Profesor Ruz");
+                    server_send_message(game->players[found]->socket, 1, message);
+                    strcpy(message, "4) Monstruo Random");
+                    server_send_message(game->players[found]->socket, 1, message);
+                    strcpy(message, "Ingrese el numero correspondiente al mounstro que quieren combatir:");
+                    server_send_message(game->players[found]->socket, 1, message);
+                    strcpy(message, "");
+                    server_send_message(game->players[found]->socket, 40, message);
+                    printf("SERVER: main | Se recepciona la elección del monstruo\n");
+                    char * monster_selection_response = server_receive_payload(i);
+                    int monster = monster_selection_response[1] - '0';
+                    free(monster_selection_response);
+                    choose_monster(game, monster);
+                    strcpy(message, "Esperando que los demás jugadores confirmen\n");
+                    server_send_message(game->players[found]->socket, 1, message);
+                }
+                continue_game_responses ++;
+                want_to_play ++;
+                //free(client_message);
+              }
+              // Caso en que el usuario quiera empezar el juego
+              if (!strncmp(client_message, "2", 1)){
+                printf("SERVER: main | El usuario no quiere seguir jugando\n");
+                  if (game->players[found]->is_leader){
+                    printf("SERVER: main | Aqui hay que reasignar el lider\n");
+
+                    strcpy(message, "Adios y que te vaya bien!\n");
+                    server_send_message(game->players[i]->socket, 69, message);
+                }
+                //free(client_message);
+                continue_game_responses ++;
+              }
+            
+          }
+        }
       }
-      /* Hacer algo con current_skill y current_target seteado en el jugador del turno*/
-      if (game->remaining_players && game->monster->current_life) {
-        update_round(game);
+      if (want_to_play){
+        turn = 0;
+        game->rounds = 0;
       }
-      if (game->remaining_players == 0 ) {
-        printf("SERVER: main | No quedan jugadores. Monstruo gano\n");
-      }
-      else if (!game->monster->current_life) {
-        printf("SERVER: main | Felicidades! Han logrado vencer al monstruo\n");
-      }
-      game->rounds ++;
     }
+
+
     /* Liberar memoria */
     for (int i = 0; i < MAX_N_PLAYERS; i++){
       free(game->players[i]);
