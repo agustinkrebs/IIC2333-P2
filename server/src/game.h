@@ -17,3 +17,6 @@ void choose_player_type(Player* player);
 void use_skills(Player* player, Game* game);
 void use_monster_skills(Game* game);
 void update_round(Game* game);
+void send_stats(Game* game, Player* player);
+Player* get_random_player(Game* game);
+void send_last_action_to_clients(Game* game, char* message);
