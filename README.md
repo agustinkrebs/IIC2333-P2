@@ -9,10 +9,17 @@
 
 ## Instrucciones para ejecutar
 
-¿Cómo correr los Makefile?
-
-¿Cómo correr para jugar?
-
+### ¿Cómo correr para jugar?  
+En la carpeta `server`:
+```
+make
+./server -i 0.0.0.0 -p 8080
+```
+En la carpeta `client`:
+```
+make
+./client -i 0.0.0.0 -p 8080
+```
 ## Diseño
 
 ### Juego
